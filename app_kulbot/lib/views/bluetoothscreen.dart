@@ -41,7 +41,7 @@ class _BluetoothScreenState extends State<BluetoothScreen> {
   FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
 
   @override
-  
+
 //   Hàm này được gọi khi widget được tạo ra để khởi tạo trạng thái ban đầu của widget.
 // Trong hàm này thực hiện các tác vụ như lấy trạng thái Bluetooth, địa chỉ và tên của thiết bị Bluetooth, trạng thái Bluetooth, tìm kiếm thiết bị.
   void initState() {
@@ -65,7 +65,9 @@ class _BluetoothScreenState extends State<BluetoothScreen> {
       });
     });
 
-    FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
+    FlutterBluetoothSerial.instance
+        .onStateChanged()
+        .listen((BluetoothState state) {
       setState(() {
         _bluetoothState = state;
       });
@@ -77,7 +79,6 @@ class _BluetoothScreenState extends State<BluetoothScreen> {
 
     _getBondedDevices();
   }
-
 
 // Hàm này bắt đầu quá trình tìm kiếm thiết bị Bluetooth mới.
 // Khi một thiết bị mới được phát hiện, nó được thêm vào danh sách devices nếu chưa tồn tại trong danh sách.
@@ -108,12 +109,18 @@ class _BluetoothScreenState extends State<BluetoothScreen> {
 
 //Hàm này được sử dụng để lấy danh sách các thiết bị Bluetooth đã được ghép nối và thêm chúng vào danh sách devices.
   void _getBondedDevices() {
-    FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> bondedDevices) {
+    FlutterBluetoothSerial.instance
+        .getBondedDevices()
+        .then((List<BluetoothDevice> bondedDevices) {
       setState(() {
-        devices = bondedDevices.map((device) => _DeviceWithAvailability(
-          device,
-          widget.checkAvailability ? _DeviceAvailability.maybe : _DeviceAvailability.yes,
-        )).toList();
+        devices = bondedDevices
+            .map((device) => _DeviceWithAvailability(
+                  device,
+                  widget.checkAvailability
+                      ? _DeviceAvailability.maybe
+                      : _DeviceAvailability.yes,
+                ))
+            .toList();
       });
     });
   }
@@ -136,36 +143,39 @@ class _BluetoothScreenState extends State<BluetoothScreen> {
         backgroundColor: _bluetoothState.isEnabled ? Colors.green : Colors.red,
       ),
       body: Container(
-        child: _bluetoothState.isEnabled ? _buildDevicesListView() : Center(child: Text('Please turn on Bluetooth')),
+        child: _bluetoothState.isEnabled
+            ? _buildDevicesListView()
+            : Center(child: Text('Please turn on Bluetooth')),
       ),
     );
   }
 
-
 //   Hàm này xây dựng giao diện danh sách các thiết bị Bluetooth được hiển thị.
 // Nó tạo ra các mục danh sách từ danh sách devices
   Widget _buildDevicesListView() {
-    List<BluetoothDeviceListEntry> list = devices.map((_device) =>
-      BluetoothDeviceListEntry(
-        device: _device.device,
-        rssi: _device.rssi,
-        enabled: _device.availability == _DeviceAvailability.yes,
-        onTap: () {
-          try {
-            //quay về page cũ sau khi kết nối
-          } catch (e) {
-            print('Error navigating to control: $e');
-          }
-        },
-      )
-    ).toList();
+    List<BluetoothDeviceListEntry> list = devices
+        .map((_device) => BluetoothDeviceListEntry(
+              device: _device.device,
+              rssi: _device.rssi,
+              enabled: _device.availability == _DeviceAvailability.yes,
+              onTap: () {
+                try {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              JoystickControl(server: _device.device)));
+                } catch (e) {
+                  print('Error navigating to control: $e');
+                }
+              },
+            ))
+        .toList();
 
     return Column(
       children: [
         Expanded(
-          child: ListView(
-            children: list
-          ),
+          child: ListView(children: list),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
