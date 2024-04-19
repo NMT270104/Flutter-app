@@ -25,14 +25,17 @@ class _Message {
 }
 
 class _JoystickControlState extends State<JoystickControl> {
-  bool isPressed = false;
+  bool isPressedTien = false;
+  bool isPressedLui = false;
+  bool isPressedLed = false;
+  bool isPressedSound = false;
 
   // String lastSentMessage = '';
-  double _currentSlidevalue = 1;
+  double _currentSlidevalue = 9;
 
   double _x = 100;
   double _y = 100;
-  JoystickMode _joystickMode = JoystickMode.all;
+  JoystickMode _joystickMode = JoystickMode.horizontal;
 
   static final clientID = 0;
   BluetoothConnection? connection;
@@ -112,145 +115,222 @@ class _JoystickControlState extends State<JoystickControl> {
             ? 'Connecting to $serverName...'
             : isConnected
                 ? 'Connected to $serverName'
-                : 'Log with $serverName'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.bluetooth),
-            onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => BluetoothScreen()));
-            },
-          ),
-        ],
+                : Navigator.defaultRouteName),
       ),
       body:
           Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             mainAxisSize: MainAxisSize.max,
             children: [
-              Text('Speed'),
-              Slider(
-                  value: _currentSlidevalue,
-                  label: _currentSlidevalue.toString(),
-                  min: 1,
-                  max: 9,
-                  onChanged: (value) {
-                    setState(() {
-                      _currentSlidevalue = value;
-                      print('${_currentSlidevalue.toInt()}');
-                      _sendMessage(
-                          '${_currentSlidevalue.toInt()}${_currentSlidevalue.toInt()}');
-                    });
-                  }),
-            ]),
-        GestureDetector(
+              Text('Voice'),
+              GestureDetector(
           onTapDown: (_) {
             setState(() {
-              isPressed = true;
-              _startPrinting();
+              isPressedLed = true;
+              _led();
             });
           },
           onTapUp: (_) {
             setState(() {
-              isPressed = false;
-              _endPrinting();
+              isPressedLed = false;
+              _endled();
             });
           },
           child: Container(
             padding: EdgeInsets.all(12.0),
-            color: isPressed ? Colors.blue : Colors.grey,
+            color: isPressedLed ? Colors.blue : Colors.grey,
             child: Text(
-              'Press and Hold',
+              'Led',
               style: TextStyle(color: Colors.white),
             ),
           ),
         ),
-
-        // JoystickView(
-        //   innerCircleColor: Color.fromARGB(255, 131, 1, 1),
-        //   backgroundColor: Color.fromARGB(255, 166, 1, 1),
-        //   onDirectionChanged: (degrees, distance) {
-        //     var degree = degrees;
-        //     if (degree != null) {
-        //       // degree = degrees;
-        //       // dist = distance;
-        //       print("$degree: $distance");
-        //       if ((degree >= 322 || degree <= 32) && degree!= 0) {
-        //         debugPrint("FORWARD");
-        //         _sendMessage("forward");
-        //       } else if (degree >= 230 && degree <= 305) {
-        //         debugPrint("LEFT");
-        //         _sendMessage("left");
-        //       } else if (degree >= 60 && degree <= 125) {
-        //         debugPrint("RIGHT");
-        //         _sendMessage("right");
-        //       } else if (degree >= 155 && degree <= 225) {
-        //         debugPrint("BACKWARD");
-        //         _sendMessage("backward");
-        //       } else if (degree== 0) {
-        //         debugPrint("STOP");
-        //         _sendMessage("stop");
-        //       }
-        //     } else {
-        //       print("degree is null");
-        //     }
-        //   },
-        // ),
-        Align(
-          alignment: const Alignment(0, 0.8),
-          child: Joystick(
-            mode: _joystickMode,
-            listener: (details) {
-              setState(() {
-                double _x = 100 + 10 * details.x;
-                double _y = 100 + 10 * details.y;
-                print("X: ${_x}");
-                print("Y: ${_y}");
-                if (_x >= 97 && _x <= 102 && _y < 100 && _y >= 90) {
-                  _sendMessage('FF');
-                } else if (_x >= 91 && _x <= 96 && _y < 100 && _y > 90) {
-                  _sendMessage('GG');
-                } else if (_x > 100 && _x <= 108 && _y < 100 && _y >= 90) {
-                  _sendMessage('II');
-                } else if (_x >= 97 && _x <= 102 && _y > 100 && _y <= 109) {
-                  _sendMessage('BB');
-                } else if (_x <= 98 && _x >= 91 && _y > 100 && _y <= 109) {
-                  _sendMessage('JJ');
-                } else if (_x > 100 && _x < 107 && _y > 100 && _y <= 107) {
-                  _sendMessage('HH');
-                } else if (_x >= 90 && _x < 100 && _y >= 97 && _y <= 102) {
-                  _sendMessage('LL');
-                } else if (_x > 100 && _x <= 109 && _y >= 97 && _y <= 102) {
-                  _sendMessage('RR');
-                } else if (_x == 100 && _y == 100) {
-                  _sendMessage('SS');
-                }
-              });
-            },
-          ),
-        ),
+              // Slider(
+              //     value: _currentSlidevalue,
+              //     label: _currentSlidevalue.toString(),
+              //     min: 1,
+              //     max: 9,
+              //     onChanged: (value) {
+              //       setState(() {
+              //         _currentSlidevalue = value;
+              //         print('${_currentSlidevalue.toInt()}');
+              //         _sendMessage(
+              //             '${_currentSlidevalue.toInt()}${_currentSlidevalue.toInt()}');
+              //       });
+              //     }),
+            ]),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Align(
+              alignment: const Alignment(0, 0.8),
+              child: Joystick(
+                mode: _joystickMode,
+                listener: (details) {
+                  setState(() {
+                    double _x = 100 + 10 * details.x;
+                    double _y = 100 + 10 * details.y;
+                    print("X: ${_x}");
+                    print("Y: ${_y}");
+                    // if (_x >= 97 && _x <= 102 && _y < 100 && _y >= 90) {
+                    //   _sendMessage('FF');
+                    // } else if (_x >= 91 && _x <= 96 && _y < 100 && _y > 90) {
+                    //   _sendMessage('GG');
+                    // } else if (_x > 100 && _x <= 108 && _y < 100 && _y >= 90) {
+                    //   _sendMessage('II');
+                    // } else if (_x >= 97 && _x <= 102 && _y > 100 && _y <= 109) {
+                    //   _sendMessage('BB');
+                    // } else if (_x <= 98 && _x >= 91 && _y > 100 && _y <= 109) {
+                    //   _sendMessage('JJ');
+                    // } else if (_x > 100 && _x < 107 && _y > 100 && _y <= 107) {
+                    //   _sendMessage('HH');
+                    // } else if (_x >= 90 && _x < 100 && _y >= 97 && _y <= 102) {
+                    //   _sendMessage('LL');
+                    // } else if (_x > 100 && _x <= 109 && _y >= 97 && _y <= 102) {
+                    //   _sendMessage('RR');
+                    // } else if (_x == 100 && _y == 100) {
+                    //   _sendMessage('SS');
+                    // }
+                    if (_x < 100) {
+                      _sendMessage('LL');
+                      print("LL");
+                    } else if (_x > 100) {
+                      _sendMessage('RR');
+                      print("RR");
+                    } else if (_x == 100) {
+                      _sendMessage('SS');
+                      print("SS");
+                    }
+                  });
+                },
+              ),
+            ),
+            Text('Speed'),
+            Slider(
+                value: _currentSlidevalue,
+                label: _currentSlidevalue.toString(),
+                min: 1,
+                max: 9,
+                onChanged: (value) {
+                  setState(() {
+                    _currentSlidevalue = value;
+                    print('${_currentSlidevalue.toInt()}');
+                    _sendMessage(
+                        '${_currentSlidevalue.toInt()}${_currentSlidevalue.toInt()}');
+                  });
+                }),
+            GestureDetector(
+              onTapDown: (_) {
+                setState(() {
+                  isPressedLui = true;
+                  _lui();
+                });
+              },
+              onTapUp: (_) {
+                setState(() {
+                  isPressedLui = false;
+                  _stop();
+                });
+              },
+              child: Container(
+                height: 100,
+                width: 60,
+                padding: EdgeInsets.all(12.0),
+                color: isPressedLui ? Colors.blue : Colors.grey,
+                child: Text(
+                  'Lui',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTapDown: (_) {
+                setState(() {
+                  isPressedTien = true;
+                  _tien();
+                });
+              },
+              onTapUp: (_) {
+                setState(() {
+                  isPressedTien = false;
+                  _stop();
+                });
+              },
+              child: Container(
+                height: 100,
+                width: 60,
+                padding: EdgeInsets.all(12.0),
+                color: isPressedTien ? Colors.blue : Colors.grey,
+                child: Text(
+                  'Tien',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        )
       ]),
     );
   }
 
-  void _startPrinting() {
-    if (isPressed) {
+  void _tien() {
+    if (isPressedTien) {
       // In liên tục khi nút được nhấn giữ
-      print('O');
-      _sendMessage('OO');
-      Future.delayed(Duration(milliseconds: 200), _startPrinting);
+      print('FF');
+      _sendMessage('FF');
+      Future.delayed(Duration(milliseconds: 200), () {
+        setState(() {
+          
+        if (_x < 100) {
+          _sendMessage('GG'); // Gửi tin nhắn khi _x < 100
+          print("GG");
+        }
+        });
+        _tien();
+      });
     }
   }
 
-  void _endPrinting() {
-    if (isPressed == false) {
-      // In liên tục khi nút được thả
-      print('O');
-      _sendMessage('PP');
-      Future.delayed(Duration(milliseconds: 200), _endPrinting);
+  void _lui() {
+    if (isPressedLui) {
+      // In liên tục khi nút được nhấn giữ
+      print('BB');
+      _sendMessage('BB');
+      Future.delayed(Duration(milliseconds: 200), _lui);
     }
   }
+
+  void _stop() {
+    if (isPressedTien == false && isPressedLui == false) {
+      // In liên tục khi nút được thả
+      print('SS');
+      _sendMessage('SS');
+      Future.delayed(Duration(milliseconds: 200));
+    }
+  }
+
+
+void _led() {
+    if (isPressedLed) {
+      // In liên tục khi nút được nhấn giữ
+      print('O');
+      _sendMessage('OO');
+      Future.delayed(Duration(milliseconds: 200), _led);
+    }
+  }
+
+  void _endled() {
+    if (isPressedLed == false) {
+      // In liên tục khi nút được thả
+      print('PP');
+      _sendMessage('PP');
+      Future.delayed(Duration(milliseconds: 200));
+    }
+  }
+
+
+
 
   void _onDataReceived(Uint8List data) {
     int backspacesCounter = 0;

@@ -45,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: [
                   GestureDetector(
+                    
                     onTapDown: (_) {
                       setState(() {
                         isPress = true;
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                      
                     },
-                    child: Container(
+                    child: Container( 
                       alignment: Alignment.center,
                       height: 150,
                       width: 150,
@@ -72,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Text(
                         'Control',
                         style: TextStyle(color: Colors.black, fontSize: 20),
+                        
                       ),
                     ),
                   ),
