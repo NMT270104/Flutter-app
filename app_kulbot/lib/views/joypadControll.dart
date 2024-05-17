@@ -1,4 +1,5 @@
 import 'package:TEST/BluetoothDeviceListEntry.dart';
+import 'package:TEST/views/utils/gesture.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +56,8 @@ class _JoystickControlState extends State<JoystickControl> {
   FlutterBluetoothSerial flutterBluetoothSerial =
       FlutterBluetoothSerial.instance;
 
-  bool isPressedLed = false;
   bool isPressedSound = false;
+  bool isPressedLight = false;
 
   double _currentSlidevalueTien = 0;
   double _currentSlidevalueLui = 0;
@@ -247,22 +248,22 @@ class _JoystickControlState extends State<JoystickControl> {
         actions: [
           Container(
             decoration: BoxDecoration(
-              color: _bluetoothState.isEnabled ? Colors.blueAccent : Colors.amber,
+              color:
+                  _bluetoothState.isEnabled ? Colors.blueAccent : Colors.amber,
               borderRadius: BorderRadius.circular(50.0),
             ),
             child: IconButton(
               icon: _bluetoothState.isEnabled
                   ? Icon(
-                      isConnected?
-                      Icons.bluetooth_connected : Icons.bluetooth,
-                      color: isConnected? Colors.green : Colors.red,
+                      isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
+                      color: isConnected ? Colors.green : Colors.red,
                     )
                   : Icon(Icons.bluetooth, color: Colors.red),
               onPressed: () {
                 // _bluetoothState.isEnabled
                 //     ?
                 _connectBluetoothDialog();
-                    //: _enableBluetoothAndConnectDialog();
+                //: _enableBluetoothAndConnectDialog();
               },
             ),
           ),
@@ -287,33 +288,35 @@ class _JoystickControlState extends State<JoystickControl> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             mainAxisSize: MainAxisSize.max,
             children: [
-              Text('Voice'),
+              Gesture(
+                onTap: () {
+                  setState(() {
+                    isPressedLight = !isPressedLight;
+                    isPressedLight == true ? _light() : _endlight();
+                  });
+                },
+                color: isPressedLight ? Colors.grey : Colors.green,
+                icon: Icons.tips_and_updates_outlined,
+              ),
               GestureDetector(
-                
                 onTapDown: (_) {
                   setState(() {
-                    isPressedLed = true;
-                    _led();
+                    isPressedSound = true;
+                    _sound();
                   });
                 },
                 onTapUp: (_) {
                   setState(() {
-                    isPressedLed = false;
-                    _endled();
+                    isPressedSound = false;
+                    _endsound();
                   });
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(50.0)
-                  ),
+                      color: isPressedSound ? Colors.grey : Colors.green,
+                      borderRadius: BorderRadius.circular(50.0)),
                   padding: EdgeInsets.all(12.0),
-                  child: IconButton(
-                    icon: Icon(Icons.volume_up),
-                    onPressed: () {
-                      
-                    },
-                  ),
+                  child: Icon(Icons.volume_up),
                 ),
               ),
             ]),
@@ -372,20 +375,21 @@ class _JoystickControlState extends State<JoystickControl> {
     return Column(
       children: [
         Container(
-          color: Colors.grey,
+          color: Colors.grey[50],
           width: 500,
-          height: 193,
-          child: ListView(children:
-          list),
+          height: 158,
+          child: ListView(children: list),
         ),
         IconButton(
+          //padding: EdgeInsets.only(top: 20),
+
           color: Colors.green,
 
-                onPressed: () {
-                  _startDiscoveryWithTimeout();
-                }, icon: Icon(Icons.autorenew),
-            ),
-
+          onPressed: () {
+            _startDiscoveryWithTimeout();
+          },
+          icon: Icon(Icons.autorenew),
+        ),
       ],
     );
   }
@@ -419,17 +423,39 @@ class _JoystickControlState extends State<JoystickControl> {
   //   }
   // }
 
-  void _led() {
-    if (isPressedLed) {
+  void _sound() {
+    if (isPressedSound) {
       // In liên tục khi nút được nhấn giữ
-      print('O');
-      _sendMessage('OO');
-      Future.delayed(Duration(milliseconds: 200),);
+      print('EE');
+      _sendMessage('EE');
+      Future.delayed(
+        Duration(milliseconds: 200),
+      );
     }
   }
 
-  void _endled() {
-    if (isPressedLed == false) {
+  void _endsound() {
+    if (isPressedSound == false) {
+      // In liên tục khi nút được thả
+      print('NN');
+      _sendMessage('NN');
+      Future.delayed(Duration(milliseconds: 200));
+    }
+  }
+
+  void _light() {
+
+      // In liên tục khi nút được nhấn giữ
+      print('O');
+      _sendMessage('OO');
+      Future.delayed(
+        Duration(milliseconds: 200),
+      );
+    
+  }
+
+  void _endlight() {
+    if (isPressedSound == false) {
       // In liên tục khi nút được thả
       print('PP');
       _sendMessage('PP');
@@ -508,7 +534,7 @@ class _JoystickControlState extends State<JoystickControl> {
     if (text.isNotEmpty) {
       try {
         // Gửi tin nhắn xuống ESP32
-        connection!.output.add(Uint8List.fromList(ascii.encode(text)));
+        connection!.output.add(Uint8List.fromList(utf8.encode(text)));
         await connection!.output.allSent;
 
         // Thêm tin nhắn vào danh sách tin nhắn
@@ -557,8 +583,7 @@ class _JoystickControlState extends State<JoystickControl> {
             'Bluetooth',
             style: TextStyle(fontSize: 20),
           ),
-          content: isConnected ? _disconnectDevice() : _buildDevicesListView()
-      ),
+          content: isConnected ? _disconnectDevice() : _buildDevicesListView()),
     );
   }
 
@@ -588,51 +613,62 @@ class _JoystickControlState extends State<JoystickControl> {
   void handleJoystickMove(details) {
     _x = 100.00 + 10 * details.x;
     _y = 100.00 + 10 * details.y;
-    // print("X: ${_x}");
-    // print("Y: ${_y}");
+    print("X: ${_x.toStringAsFixed(0)}");
+    //_sendMessage('${_x.toStringAsFixed(0)}');
+    print("Y: ${_y.toStringAsFixed(0)}");
+    //_sendMessage('${_y.toStringAsFixed(0)}');
 
     String? message;
     if (_x < 100) {
-      message = 'LL';
+      //message = 'LL';
+      _sendMessage('LL');
       print("LL");
     } else if (_x < 100 && _y < 100) {
-      message = 'GG';
+      //message = 'GG';
+      _sendMessage('GG');
       print("GG");
     } else if (_x < 100 && _y > 100) {
-      message = 'JJ';
+      //message = 'JJ';
+      _sendMessage('JJ');
       print("JJ");
     } else if (_x > 100) {
-      message = 'RR';
+      //message = 'RR';
+      _sendMessage('RR');
       print("RR");
     } else if (_x > 100 && _y < 100) {
-      message = 'II';
+      //message = 'II';
+      _sendMessage('II');
       print("II");
     } else if (_x > 100 && _y > 100) {
-      message = 'HH';
+      //message = 'HH';
+      _sendMessage('HH');
       print("HH");
     } else if (_x == 100 && _y == 100) {
-      message = 'SS';
+      //message = 'SS';
+      _sendMessage('SS');
       print("SS");
     } else if (_y > 100) {
-      message = 'BB';
+      //message = 'BB';
+      _sendMessage('BB');
       print("BB");
     } else if (_y < 100) {
-      message = 'FF';
+      //message = 'FF';
+      _sendMessage('FF');
       print("FF");
     }
 
     // Tạo một đối tượng JSON
-    Map<String, dynamic> jsonData = {
-      'command': message,
-      'x': _x.toStringAsFixed(2), // Đưa _x về dạng chuỗi với 2 chữ số thập phân
-      'y': _y.toStringAsFixed(2),
-    };
+    // Map<String, dynamic> jsonData = {
+    //   'command': message,
+    //   'x': _x.toStringAsFixed(2), // Đưa _x về dạng chuỗi với 2 chữ số thập phân
+    //   'y': _y.toStringAsFixed(2),
+    // };
 
-    // Chuyển đối JSON thành chuỗi
-    String jsonString = jsonEncode(jsonData);
+    // // Chuyển đối JSON thành chuỗi
+    // String jsonString = jsonEncode(jsonData);
 
-    // Gửi chuỗi JSON đi
-    _sendMessage(jsonString);
-    print(' jsonString: $jsonString');
+    // // Gửi chuỗi JSON đi
+    // _sendMessage(jsonString);
+    // print(' jsonString: $jsonString');
   }
 }
