@@ -43,6 +43,7 @@ dependencies:
   flutter_joystick: ^0.0.4
   speech_to_text: ^6.6.1
   avatar_glow: ^3.0.1
+  carousel_slider: ^4.2.1
   #control_pad: ^1.1.1+1
 
 
@@ -75,6 +76,7 @@ flutter:
   assets:
     - lib/assets/images/robothead.png
     - lib/assets/images/setting.png
+    - lib/assets/images/kulbot.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

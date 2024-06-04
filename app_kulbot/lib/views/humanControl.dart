@@ -14,7 +14,7 @@ class _humanControlState extends State<humanControl> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Settings"),
+        title: Text("humanControl"),
       ),
       body: 
       Center(

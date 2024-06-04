@@ -219,12 +219,12 @@ class _JoystickControlState extends State<JoystickControl> {
   @override
   void dispose() {
     // Loại bỏ cài đặt khi StatefulWidget bị hủy
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.portraitUp,
+    //   DeviceOrientation.portraitDown,
+    //   DeviceOrientation.landscapeLeft,
+    //   DeviceOrientation.landscapeRight,
+    // ]);
 
     FlutterBluetoothSerial.instance.cancelDiscovery();
 
@@ -262,6 +262,7 @@ class _JoystickControlState extends State<JoystickControl> {
               onPressed: () {
                 // _bluetoothState.isEnabled
                 //     ?
+                _startDiscoveryWithTimeout();
                 _connectBluetoothDialog();
                 //: _enableBluetoothAndConnectDialog();
               },
@@ -324,8 +325,8 @@ class _JoystickControlState extends State<JoystickControl> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              width: 150,
-              height: 150,
+              width: 170,
+              height: 170,
               margin: EdgeInsets.only(top: 40, left: 10),
               alignment: const Alignment(0, 0.8),
               child: Joystick(
@@ -344,8 +345,8 @@ class _JoystickControlState extends State<JoystickControl> {
             //   ),
             // ),
             Container(
-              width: 150,
-              height: 150,
+              width: 170,
+              height: 170,
               margin: EdgeInsets.only(top: 40, right: 10),
               alignment: const Alignment(0, 0.8),
               child: Joystick(
@@ -360,6 +361,8 @@ class _JoystickControlState extends State<JoystickControl> {
 //   Hàm này xây dựng giao diện danh sách các thiết bị Bluetooth được hiển thị.
 // Nó tạo ra các mục danh sách từ danh sách devices
   Widget _buildDevicesListView() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     List<BluetoothDeviceListEntry> list = devices
         .map((_device) => BluetoothDeviceListEntry(
               device: _device.device,
@@ -376,19 +379,9 @@ class _JoystickControlState extends State<JoystickControl> {
       children: [
         Container(
           color: Colors.grey[50],
-          width: 500,
-          height: 158,
+          width: screenWidth * 1,
+          height: screenHeight * 0.50,
           child: ListView(children: list),
-        ),
-        IconButton(
-          //padding: EdgeInsets.only(top: 20),
-
-          color: Colors.green,
-
-          onPressed: () {
-            _startDiscoveryWithTimeout();
-          },
-          icon: Icon(Icons.autorenew),
         ),
       ],
     );
@@ -444,14 +437,12 @@ class _JoystickControlState extends State<JoystickControl> {
   }
 
   void _light() {
-
-      // In liên tục khi nút được nhấn giữ
-      print('O');
-      _sendMessage('OO');
-      Future.delayed(
-        Duration(milliseconds: 200),
-      );
-    
+    // In liên tục khi nút được nhấn giữ
+    print('O');
+    _sendMessage('OO');
+    Future.delayed(
+      Duration(milliseconds: 200),
+    );
   }
 
   void _endlight() {
@@ -575,13 +566,18 @@ class _JoystickControlState extends State<JoystickControl> {
   }
 
   Future<void> _connectBluetoothDialog() async {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          titlePadding: EdgeInsets.only(left: 20, top: 3),
+          titlePadding: EdgeInsets.only(left: screenWidth * 0.35, top: 2),
           title: Text(
-            'Bluetooth',
-            style: TextStyle(fontSize: 20),
+            'Bluetooth ',
+            style: TextStyle(
+              fontSize: 20,
+            ),
           ),
           content: isConnected ? _disconnectDevice() : _buildDevicesListView()),
     );

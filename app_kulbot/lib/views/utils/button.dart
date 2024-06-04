@@ -18,19 +18,20 @@ class Button extends StatelessWidget {
                 context, MaterialPageRoute(builder: (context) => navigator));
           },
           child: Container(
-            width: 100,
-            height: 100,
+            width: MediaQuery.of(context).size.width*0.2,
+            height: MediaQuery.of(context).size.height*0.4,
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade400,
-                    blurRadius: 20,
-                    spreadRadius: 10,
-                  )
-                ]),
+                // boxShadow: [
+                //   BoxShadow(
+                //     color: Colors.grey.shade400,
+                //     blurRadius: 20,
+                //     spreadRadius: 10,
+                //   )
+                // ]
+                ),
             child: Center(
               child: Image.asset(imgPath),
             ),
