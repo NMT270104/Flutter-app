@@ -39,13 +39,14 @@ dependencies:
   permission_handler: ^11.3.0
   flutter_chat_bubble: ^2.0.2
   flutter_bluetooth_serial: ^0.4.0
-  control_pad_plus: ^0.1.0
+  #control_pad_plus: ^0.1.0
   flutter_joystick: ^0.0.4
-  speech_to_text: ^6.6.1
+  speech_to_text: ^6.6.2
   avatar_glow: ^3.0.1
   carousel_slider: ^4.2.1
   #control_pad: ^1.1.1+1
 
+  
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,10 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+
+dependency_overrides:
+  js: ^0.7.1
+
 flutter:
   
   # The following line ensures that the Material Icons font is
@@ -74,9 +79,9 @@ flutter:
   #   - lib/icons/1.png
   #   - images/a_dot_ham.jpeg
   assets:
-    - lib/assets/images/robothead.png
-    - lib/assets/images/setting.png
-    - lib/assets/images/kulbot.png
+    - lib/assets/images/
+    - lib/assets/images/
+    - lib/assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
