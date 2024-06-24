@@ -6,7 +6,7 @@ class ButtonHomeScreen extends StatelessWidget {
   final textButton;
   final navigator;
 
-  const ButtonHomeScreen({super.key, this.imgPath, this.textButton, this.navigator});
+   ButtonHomeScreen({super.key, this.imgPath, this.textButton, this.navigator});
 
   @override
   Widget build(BuildContext context) {

@@ -1,24 +1,25 @@
-import 'package:TEST/BluetoothDeviceListEntry.dart';
-import 'package:TEST/views/utils/gesture.dart';
+import 'package:TEST/utils/BluetoothDeviceListEntry.dart';
+import 'package:TEST/utils/gesture.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:highlight_text/highlight_text.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-class JoystickControl extends StatefulWidget {
+class Bascotcontrolscreen extends StatefulWidget {
   final bool checkAvailability;
 
-  const JoystickControl({this.checkAvailability = true});
+  const Bascotcontrolscreen({this.checkAvailability = true});
 
   @override
-  State<JoystickControl> createState() => _JoystickControlState();
+  State<Bascotcontrolscreen> createState() => _BascotcontrolscreenState();
 }
 
 enum _DeviceAvailability {
@@ -42,7 +43,32 @@ class _Message {
   _Message(this.whom, this.text);
 }
 
-class _JoystickControlState extends State<JoystickControl> {
+class _BascotcontrolscreenState extends State<Bascotcontrolscreen> {
+//highlight voice to text
+  final Map<String, HighlightedWord> _highlights = {
+    'flutter': HighlightedWord(
+      onTap: () => print('flutter'),
+      textStyle: const TextStyle(
+        color: Colors.blue,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    'right': HighlightedWord(
+      onTap: () => print('right'),
+      textStyle: const TextStyle(
+        color: Colors.green,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    'left': HighlightedWord(
+      onTap: () => print('left'),
+      textStyle: const TextStyle(
+        color: Colors.red,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  };
+
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String voicetotext = "";
@@ -127,7 +153,11 @@ class _JoystickControlState extends State<JoystickControl> {
     _speech = stt.SpeechToText();
   }
 
-  void _connectToDevice(BluetoothDevice device) async {
+  //hàm kết nối bluetooth
+  void _connectToDevice(BluetoothDevice device, BuildContext context) async {
+    if (isConnected) {
+      Navigator.of(context).pop();
+    }
     try {
       BluetoothConnection connection =
           await BluetoothConnection.toAddress(device.address);
@@ -263,7 +293,7 @@ class _JoystickControlState extends State<JoystickControl> {
                 // _bluetoothState.isEnabled
                 //     ?
                 _startDiscoveryWithTimeout();
-                _connectBluetoothDialog();
+                isConnected ? _disconnectDevice() : _connectBluetoothDialog();
                 //: _enableBluetoothAndConnectDialog();
               },
             ),
@@ -324,30 +354,39 @@ class _JoystickControlState extends State<JoystickControl> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // joystick left
             Container(
               width: 170,
               height: 170,
-              margin: EdgeInsets.only(top: 40, left: 10),
+              margin: EdgeInsets.only(bottom: 40, left: 50),
               alignment: const Alignment(0, 0.8),
               child: Joystick(
                   mode: _joystickModeLeft, listener: handleJoystickMove),
             ),
-            // Container(
-            //   margin: EdgeInsets.only(top: 50),
-            //   decoration: BoxDecoration(
-            //       color: Colors.green, borderRadius: BorderRadius.circular(50)),
-            //   child: IconButton(
-
-            //     icon: Icon(_isListening? Icons.mic : Icons.mic_none),
-            //     onPressed: () {
-
-            //     },
-            //   ),
-            // ),
+            // label voice to textb
+            Column(children: <Widget>[
+              Container(
+                
+                height: MediaQuery.of(context).size.height*0.5,
+                width: MediaQuery.of(context).size.width*0.3,
+                //padding: const EdgeInsets.only(30.0, 30.0, 30.0, 150.0),
+                child: TextHighlight(
+                  textAlign: TextAlign.center,
+                  text: voicetotext == '' ? "..." : voicetotext,
+                  words: _highlights,
+                  textStyle: const TextStyle(
+                    fontSize: 32.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ]),
+            // joystick right
             Container(
               width: 170,
               height: 170,
-              margin: EdgeInsets.only(top: 40, right: 10),
+              margin: EdgeInsets.only(bottom: 40, right: 50),
               alignment: const Alignment(0, 0.8),
               child: Joystick(
                   mode: _joystickModeRight, listener: handleJoystickMove),
@@ -360,7 +399,7 @@ class _JoystickControlState extends State<JoystickControl> {
 
 //   Hàm này xây dựng giao diện danh sách các thiết bị Bluetooth được hiển thị.
 // Nó tạo ra các mục danh sách từ danh sách devices
-  Widget _buildDevicesListView() {
+  Widget _buildDevicesListView(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     List<BluetoothDeviceListEntry> list = devices
@@ -370,7 +409,7 @@ class _JoystickControlState extends State<JoystickControl> {
               enabled: _device.availability == _DeviceAvailability.yes,
               onTap: () {
                 // Gọi hàm để kết nối Bluetooth khi người dùng chọn thiết bị
-                _connectToDevice(_device.device);
+                _connectToDevice(_device.device, context);
               },
             ))
         .toList();
@@ -386,35 +425,6 @@ class _JoystickControlState extends State<JoystickControl> {
       ],
     );
   }
-
-  // void _tien() {
-  //   if (isPressedTien) {
-  //     // In liên tục khi nút được nhấn giữ
-  //     print('FF');
-  //     _sendMessage('FF');
-  //     Future.delayed(Duration(milliseconds: 200), () {
-  //       _tien();
-  //     });
-  //   }
-  // }
-
-  // void _lui() {
-  //   if (isPressedLui) {
-  //     // In liên tục khi nút được nhấn giữ
-  //     print('BB');
-  //     _sendMessage('BB');
-  //     Future.delayed(Duration(milliseconds: 200), _lui);
-  //   }
-  // }
-
-  // void _stop() {
-  //   if (isPressedTien == false && isPressedLui == false) {
-  //     // In liên tục khi nút được thả
-  //     print('SS');
-  //     _sendMessage('SS');
-  //     Future.delayed(Duration(milliseconds: 200));
-  //   }
-  // }
 
   void _sound() {
     if (isPressedSound) {
@@ -477,47 +487,8 @@ class _JoystickControlState extends State<JoystickControl> {
       }
     }
   }
-  //   String dataString = String.fromCharCodes(buffer);
-  //   int index = buffer.indexOf(13);
-  //   if (~index != 0) {
-  //     setState(() {
-  //       messages.add(
-  //         _Message(
-  //           1,
-  //           backspacesCounter > 0
-  //               ? _messageBuffer.substring(
-  //                   0, _messageBuffer.length - backspacesCounter)
-  //               : _messageBuffer + dataString.substring(0, index),
-  //         ),
-  //       );
-  //       _messageBuffer = dataString.substring(index);
-  //     });
-  //   } else {
-  //     _messageBuffer = (backspacesCounter > 0
-  //         ? _messageBuffer.substring(
-  //             0, _messageBuffer.length - backspacesCounter)
-  //         : _messageBuffer + dataString);
-  //   }
-  // }
 
-  // void _sendMessage(String text) async {
-  //   text = text.trim();
-  //   textEditingController.clear();
-
-  //   if (text.isNotEmpty) {
-  //     try {
-  //       connection!.output.add(Uint8List.fromList(utf8.encode(text + "\r\n")));
-  //       await connection!.output.allSent;
-
-  //       setState(() {
-  //         messages.add(_Message(clientID, text));
-  //       });
-  //     } catch (e) {
-  //       print("Error sending message: $e");
-  //     }
-  //   }
-  // }
-
+  //hàm gửi data đến thiết bị kết nối
   void _sendMessage(String text) async {
     text = text.trim();
     textEditingController.clear();
@@ -538,6 +509,7 @@ class _JoystickControlState extends State<JoystickControl> {
     }
   }
 
+// hàm nghe voice to text
   void _listenVoiceToText() async {
     if (!_isListening) {
       print('_listenVoiceToText : false');
@@ -551,7 +523,7 @@ class _JoystickControlState extends State<JoystickControl> {
         _speech.listen(
           onResult: (val) => setState(() {
             voicetotext = val.recognizedWords;
-            _sendMessage(voicetotext);
+            moveMotor();
             print("VoiceToText: $voicetotext");
             // if (val.hasConfidenceRating && val.confidence > 0) {
             //   _confidence = val.confidence;
@@ -562,35 +534,57 @@ class _JoystickControlState extends State<JoystickControl> {
     } else {
       setState(() => _isListening = false);
       _speech.stop();
+      moveMotor();
     }
   }
 
-  Future<void> _connectBluetoothDialog() async {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+// ham gui data sau khi ket thuc voice to text
+  void moveMotor() {
+    if (voicetotext.contains('Tiến') ||
+        voicetotext.contains('lên') ||
+        voicetotext.contains('forward')) {
+      _sendMessage('FF');
+    } else if (voicetotext.contains('lui') ||
+        voicetotext.contains('lùi') ||
+        voicetotext.contains('back')) {
+      _sendMessage('BB');
+    } else if (voicetotext.contains('trái') || voicetotext.contains('left')) {
+      _sendMessage('LL');
+    } else if (voicetotext.contains('phải') || voicetotext.contains('right')) {
+      _sendMessage('RR');
+    }
+  }
 
+  //hàm show dialog danh sách các thiết bị bluetooth
+  Future<void> _connectBluetoothDialog() async {
+    double screenWidth = MediaQuery.of(context).size.width * 1;
+    double screenHeight = MediaQuery.of(context).size.height;
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          titlePadding: EdgeInsets.only(left: screenWidth * 0.35, top: 2),
-          title: Text(
+          alignment: Alignment.center,
+          title: const Text(
             'Bluetooth ',
-            style: TextStyle(
-              fontSize: 20,
-            ),
+            style: TextStyle(fontSize: 20, color: Colors.black),
           ),
-          content: isConnected ? _disconnectDevice() : _buildDevicesListView()),
+          content: _bluetoothState.isEnabled
+              ? _buildDevicesListView(context)
+              : Text("Bluetooth chưa được bật")),
     );
   }
 
-//hàm yêu cầu mở bluetooth
-  void _enableBluetoothAndConnectDialog() async {
-    // Yêu cầu bật Bluetooth
-    await FlutterBluetoothSerial.instance.requestEnable();
-
-    // Sau khi yêu cầu đã hoàn thành, hiển thị dialog Bluetooth
-    _connectBluetoothDialog();
+  void _closeBluetoothDialog(BuildContext context) {
+    Navigator.of(context).pop();
   }
+
+//hàm yêu cầu mở bluetooth
+  // void _enableBluetoothAndConnectDialog() async {
+  //   // Yêu cầu bật Bluetooth
+  //   await FlutterBluetoothSerial.instance.requestEnable();
+
+  //   // Sau khi yêu cầu đã hoàn thành, hiển thị dialog Bluetooth
+  //   _connectBluetoothDialog();
+  // }
 
 // hàm ngắt kết nối với thiết bị
   _disconnectDevice() {
@@ -605,54 +599,47 @@ class _JoystickControlState extends State<JoystickControl> {
         child: Text('Ngắt kết nối với $connectedDeviceName'));
   }
 
-  // Hàm để in giá trị _x và gửi chuỗi JSON tương ứng
+  // Hàm để in giá trị _x,_y và gửi chuỗi JSON tương ứng
   void handleJoystickMove(details) {
-    _x = 100.00 + 10 * details.x;
-    _y = 100.00 + 10 * details.y;
+    _x = 100.0 + 10 * details.x;
+    _y = 100.0 + 10 * details.y;
     print("X: ${_x.toStringAsFixed(0)}");
     //_sendMessage('${_x.toStringAsFixed(0)}');
     print("Y: ${_y.toStringAsFixed(0)}");
     //_sendMessage('${_y.toStringAsFixed(0)}');
 
     String? message;
-    if (_x < 100) {
-      //message = 'LL';
-      _sendMessage('LL');
-      print("LL");
-    } else if (_x < 100 && _y < 100) {
-      //message = 'GG';
-      _sendMessage('GG');
-      print("GG");
-    } else if (_x < 100 && _y > 100) {
-      //message = 'JJ';
-      _sendMessage('JJ');
-      print("JJ");
-    } else if (_x > 100) {
-      //message = 'RR';
-      _sendMessage('RR');
-      print("RR");
-    } else if (_x > 100 && _y < 100) {
-      //message = 'II';
-      _sendMessage('II');
-      print("II");
-    } else if (_x > 100 && _y > 100) {
-      //message = 'HH';
-      _sendMessage('HH');
-      print("HH");
-    } else if (_x == 100 && _y == 100) {
-      //message = 'SS';
-      _sendMessage('SS');
-      print("SS");
+    if (_y < 100) {
+      if (_x < 100) {
+        print("Tien Trai");
+        _sendMessage("");
+      } else if (_x > 100) {
+        print("Tien Phai");
+        _sendMessage("");
+      } else {
+        print("Tien");
+        _sendMessage("FF");
+      }
     } else if (_y > 100) {
-      //message = 'BB';
-      _sendMessage('BB');
-      print("BB");
-    } else if (_y < 100) {
-      //message = 'FF';
-      _sendMessage('FF');
-      print("FF");
+      if (_x < 100) {
+        print("Lui Trai");
+        _sendMessage("");
+      } else if (_x > 100) {
+        print("Lui Phai");
+        _sendMessage("");
+      } else {
+        print("Lui");
+        _sendMessage("BB");
+      }
+    } else {
+      if (_x < 100) {
+        print("Trai");
+        _sendMessage("LL");
+      } else {
+        print("Phai");
+        _sendMessage("RR");
+      }
     }
-
     // Tạo một đối tượng JSON
     // Map<String, dynamic> jsonData = {
     //   'command': message,

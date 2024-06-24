@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:highlight_text/highlight_text.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -43,6 +44,31 @@ class _Message {
 }
 
 class _JoystickControlState extends State<JoystickControl> {
+//highlight voice to text
+  final Map<String, HighlightedWord> _highlights = {
+    'flutter': HighlightedWord(
+      onTap: () => print('flutter'),
+      textStyle: const TextStyle(
+        color: Colors.blue,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    'right': HighlightedWord(
+      onTap: () => print('right'),
+      textStyle: const TextStyle(
+        color: Colors.green,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    'left': HighlightedWord(
+      onTap: () => print('left'),
+      textStyle: const TextStyle(
+        color: Colors.red,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  };
+
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String voicetotext = "";
@@ -267,7 +293,7 @@ class _JoystickControlState extends State<JoystickControl> {
                 // _bluetoothState.isEnabled
                 //     ?
                 _startDiscoveryWithTimeout();
-                isConnected ? _disconnectDevice() : _connectBluetoothDialog();
+                isConnected ? connection?.dispose() : _connectBluetoothDialog();
                 //: _enableBluetoothAndConnectDialog();
               },
             ),
@@ -300,7 +326,7 @@ class _JoystickControlState extends State<JoystickControl> {
                     isPressedLight == true ? _light() : _endlight();
                   });
                 },
-                color: isPressedLight ? Colors.grey : Colors.green,
+                color: isPressedLight ? Colors.green : Colors.grey,
                 icon: Icons.tips_and_updates_outlined,
               ),
               GestureDetector(
@@ -328,30 +354,38 @@ class _JoystickControlState extends State<JoystickControl> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // joystick left
             Container(
               width: 170,
               height: 170,
-              margin: EdgeInsets.only(top: 40, left: 10),
+              margin: EdgeInsets.only(bottom: 40, left: 50),
               alignment: const Alignment(0, 0.8),
               child: Joystick(
                   mode: _joystickModeLeft, listener: handleJoystickMove),
             ),
-            // Container(
-            //   margin: EdgeInsets.only(top: 50),
-            //   decoration: BoxDecoration(
-            //       color: Colors.green, borderRadius: BorderRadius.circular(50)),
-            //   child: IconButton(
-
-            //     icon: Icon(_isListening? Icons.mic : Icons.mic_none),
-            //     onPressed: () {
-
-            //     },
-            //   ),
-            // ),
+            // label voice to textb
+            Column(children: <Widget>[
+              Container(
+                height: MediaQuery.of(context).size.height * 0.5,
+                width: MediaQuery.of(context).size.width * 0.3,
+                //padding: const EdgeInsets.only(30.0, 30.0, 30.0, 150.0),
+                child: TextHighlight(
+                  textAlign: TextAlign.center,
+                  text: voicetotext == '' ? "..." : voicetotext,
+                  words: _highlights,
+                  textStyle: const TextStyle(
+                    fontSize: 32.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ]),
+            // joystick right
             Container(
               width: 170,
               height: 170,
-              margin: EdgeInsets.only(top: 40, right: 10),
+              margin: EdgeInsets.only(bottom: 40, right: 50),
               alignment: const Alignment(0, 0.8),
               child: Joystick(
                   mode: _joystickModeRight, listener: handleJoystickMove),
@@ -390,35 +424,6 @@ class _JoystickControlState extends State<JoystickControl> {
       ],
     );
   }
-
-  // void _tien() {
-  //   if (isPressedTien) {
-  //     // In liên tục khi nút được nhấn giữ
-  //     print('FF');
-  //     _sendMessage('FF');
-  //     Future.delayed(Duration(milliseconds: 200), () {
-  //       _tien();
-  //     });
-  //   }
-  // }
-
-  // void _lui() {
-  //   if (isPressedLui) {
-  //     // In liên tục khi nút được nhấn giữ
-  //     print('BB');
-  //     _sendMessage('BB');
-  //     Future.delayed(Duration(milliseconds: 200), _lui);
-  //   }
-  // }
-
-  // void _stop() {
-  //   if (isPressedTien == false && isPressedLui == false) {
-  //     // In liên tục khi nút được thả
-  //     print('SS');
-  //     _sendMessage('SS');
-  //     Future.delayed(Duration(milliseconds: 200));
-  //   }
-  // }
 
   void _sound() {
     if (isPressedSound) {
@@ -481,46 +486,6 @@ class _JoystickControlState extends State<JoystickControl> {
       }
     }
   }
-  //   String dataString = String.fromCharCodes(buffer);
-  //   int index = buffer.indexOf(13);
-  //   if (~index != 0) {
-  //     setState(() {
-  //       messages.add(
-  //         _Message(
-  //           1,
-  //           backspacesCounter > 0
-  //               ? _messageBuffer.substring(
-  //                   0, _messageBuffer.length - backspacesCounter)
-  //               : _messageBuffer + dataString.substring(0, index),
-  //         ),
-  //       );
-  //       _messageBuffer = dataString.substring(index);
-  //     });
-  //   } else {
-  //     _messageBuffer = (backspacesCounter > 0
-  //         ? _messageBuffer.substring(
-  //             0, _messageBuffer.length - backspacesCounter)
-  //         : _messageBuffer + dataString);
-  //   }
-  // }
-
-  // void _sendMessage(String text) async {
-  //   text = text.trim();
-  //   textEditingController.clear();
-
-  //   if (text.isNotEmpty) {
-  //     try {
-  //       connection!.output.add(Uint8List.fromList(utf8.encode(text + "\r\n")));
-  //       await connection!.output.allSent;
-
-  //       setState(() {
-  //         messages.add(_Message(clientID, text));
-  //       });
-  //     } catch (e) {
-  //       print("Error sending message: $e");
-  //     }
-  //   }
-  // }
 
   //hàm gửi data đến thiết bị kết nối
   void _sendMessage(String text) async {
@@ -543,6 +508,7 @@ class _JoystickControlState extends State<JoystickControl> {
     }
   }
 
+// hàm nghe voice to text
   void _listenVoiceToText() async {
     if (!_isListening) {
       print('_listenVoiceToText : false');
@@ -556,7 +522,7 @@ class _JoystickControlState extends State<JoystickControl> {
         _speech.listen(
           onResult: (val) => setState(() {
             voicetotext = val.recognizedWords;
-            _sendMessage(voicetotext);
+            moveMotor();
             print("VoiceToText: $voicetotext");
             // if (val.hasConfidenceRating && val.confidence > 0) {
             //   _confidence = val.confidence;
@@ -567,7 +533,29 @@ class _JoystickControlState extends State<JoystickControl> {
     } else {
       setState(() => _isListening = false);
       _speech.stop();
+      moveMotor();
     }
+  }
+
+// ham gui data sau khi ket thuc voice to text
+  void moveMotor() {
+    if (voicetotext.contains('Tiến') ||
+        voicetotext.contains('lên') ||
+        voicetotext.contains('forward')) {
+      _sendMessage('FF');
+    } else if (voicetotext.contains('lui') ||
+        voicetotext.contains('lùi') ||
+        voicetotext.contains('back')) {
+      _sendMessage('BB');
+    } else if (voicetotext.contains('trái') || voicetotext.contains('left')) {
+      _sendMessage('LL');
+    } else if (voicetotext.contains('phải') || voicetotext.contains('right')) {
+      _sendMessage('RR');
+    }
+    else if (voicetotext.contains('dừng lại') || voicetotext.contains('stop')) {
+      _sendMessage('SS');
+    }
+    
   }
 
   //hàm show dialog danh sách các thiết bị bluetooth
@@ -634,31 +622,30 @@ class _JoystickControlState extends State<JoystickControl> {
       } else {
         print("Tien");
         _sendMessage("FF");
-
       }
     } else if (_y > 100) {
       if (_x < 100) {
         print("Lui Trai");
         _sendMessage("");
-
       } else if (_x > 100) {
         print("Lui Phai");
         _sendMessage("");
-
       } else {
         print("Lui");
         _sendMessage("BB");
-
       }
-    } else {
+    
+    }
+    else if (_x == 100 && _y ==100){
+      _sendMessage("SS");
+    }
+     else {
       if (_x < 100) {
         print("Trai");
         _sendMessage("LL");
-
       } else {
         print("Phai");
         _sendMessage("RR");
-
       }
     }
     // Tạo một đối tượng JSON

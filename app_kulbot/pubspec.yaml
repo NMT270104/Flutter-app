@@ -44,6 +44,10 @@ dependencies:
   speech_to_text: ^6.6.2
   avatar_glow: ^3.0.1
   carousel_slider: ^4.2.1
+  provider: ^6.1.2
+  wakelock: ^0.6.2
+  highlight_text: ^1.7.0
+  flutter_localization: ^0.2.0
   #control_pad: ^1.1.1+1
 
   
@@ -68,7 +72,7 @@ dependency_overrides:
   js: ^0.7.1
 
 flutter:
-  
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

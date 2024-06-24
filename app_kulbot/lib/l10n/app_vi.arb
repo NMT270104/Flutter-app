@@ -1,0 +1,7 @@
+{
+  "carControl": "điều khiển robot xe",
+  "dogControl": "điều khiển robot chó",
+  "humanControl": "điều khiển robot người",
+  "setting": "Cài đặt",
+  "title": "Trang chủ"
+}
