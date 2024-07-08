@@ -1,7 +1,10 @@
 {
+  "bascotControl": "Boscat Control",
   "carControl": "Car Control",
+  "darkMode": "DarkMode",
   "dogControl": "Dog Control",
   "humanControl": "Human Control",
+  "lightMode": "LightMode",
   "setting": "Setting",
   "title": "Home"
 }

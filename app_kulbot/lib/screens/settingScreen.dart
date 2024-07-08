@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:TEST/provider/provider.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class settingScreen extends StatefulWidget {
   settingScreen({super.key});
@@ -36,6 +39,8 @@ class _settingScreenState extends State<settingScreen> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final provider = Provider.of<LocaleProvider>(context);
+    final locale = provider.locale ?? Locale('en');
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -47,7 +52,9 @@ class _settingScreenState extends State<settingScreen> {
           children: [
             SwitchListTile(
               title: Text(
-                themeNotifier.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                themeNotifier.isDarkMode
+                    ? AppLocalizations.of(context)!.darkMode
+                    : AppLocalizations.of(context)!.lightMode,
               ),
               value: themeNotifier.isDarkMode,
               onChanged: (bool value) {
@@ -55,30 +62,41 @@ class _settingScreenState extends State<settingScreen> {
               },
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 15,right: 15),
+              padding: const EdgeInsets.only(left: 15, right: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  
-                  Text("Change Language",style: TextStyle(fontSize: 16),),
+                  Text(
+                    "Change Language",
+                    style: TextStyle(fontSize: 16),
+                  ),
                   DropdownButtonHideUnderline(
                     child: DropdownButton(
-                      icon: Padding( padding: EdgeInsets.only(right: 26),
-                        child: Icon(Icons.menu,size: 30,)),
-                      items: L10n.all.map((locale) {
-                        final flag = L10n.getflag(locale.languageCode);
-                        return DropdownMenuItem<Object>(
-                          value: locale,
-                          child: Center(
-                            child: Text(flag, style: TextStyle(fontSize: 32)),
-                          ),
-                        );
-                      }).toList(), // Convert Iterable to List
-                      onChanged: (Object? value) {
-                        if (value is Locale) {
-                          // handle the value
-                        }
-                      },
+                      value: locale,
+                      icon: Container(width: 12),
+                      items: L10n.all.map(
+                        (locale) {
+                          final flag = L10n.getflag(locale.languageCode);
+
+                          return DropdownMenuItem(
+                            child: Center(
+                              child: Text(
+                                flag,
+                                style: TextStyle(fontSize: 32),
+                              ),
+                            ),
+                            value: locale,
+                            onTap: () {
+                              final provider = Provider.of<LocaleProvider>(
+                                  context,
+                                  listen: false);
+
+                              provider.setLocale(locale);
+                            },
+                          );
+                        },
+                      ).toList(),
+                      onChanged: (_) {},
                     ),
                   ),
                 ],

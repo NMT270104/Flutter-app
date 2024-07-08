@@ -39,7 +39,7 @@ dependencies:
   permission_handler: ^11.3.0
   flutter_chat_bubble: ^2.0.2
   flutter_bluetooth_serial: ^0.4.0
-  #control_pad_plus: ^0.1.0
+
   flutter_joystick: ^0.0.4
   speech_to_text: ^6.6.2
   avatar_glow: ^3.0.1
@@ -48,7 +48,15 @@ dependencies:
   wakelock: ^0.6.2
   highlight_text: ^1.7.0
   flutter_localization: ^0.2.0
-  #control_pad: ^1.1.1+1
+  flutter_blockly: ^1.4.5
+
+  tflite_flutter: ^0.10.4
+  camera: ^0.10.5+2
+  image: ^4.0.17
+  path_provider: ^2.0.15
+  image_picker: ^1.0.0
+  exif: ^3.1.4
+
 
   
 
@@ -84,8 +92,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - lib/assets/images/
-    - lib/assets/images/
-    - lib/assets/images/
+    - assets/models/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

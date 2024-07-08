@@ -1,5 +1,5 @@
 import 'package:TEST/utils/BluetoothDeviceListEntry.dart';
-import 'package:TEST/utils/gesture.dart';
+import 'package:TEST/utils/GestureHome.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -319,7 +319,7 @@ class _BascotcontrolscreenState extends State<Bascotcontrolscreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             mainAxisSize: MainAxisSize.max,
             children: [
-              Gesture(
+              GestureHome(
                 onTap: () {
                   setState(() {
                     isPressedLight = !isPressedLight;

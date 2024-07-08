@@ -1,4 +1,5 @@
 import 'package:TEST/l10n/l10n.dart';
+import 'package:TEST/provider/provider.dart';
 import 'package:TEST/screens/homeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,26 +19,32 @@ class Kulbot extends StatelessWidget {
   const Kulbot({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Kulbot',
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Provider.of<ThemeNotifier>(context).isDarkMode
+   Widget build(BuildContext context) => ChangeNotifierProvider(
+        create: (context) => LocaleProvider(),
+        builder: (context, child) {
+          final provider = Provider.of<LocaleProvider>(context);
+
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'KulBot',
+            theme: ThemeData(
+              useMaterial3: true,
+              brightness: Provider.of<ThemeNotifier>(context).isDarkMode
             ? Brightness.dark
             : Brightness.light,
-      ),
-      supportedLocales: L10n.all,
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      home:  HomeScreen(),
-    );
-  }
+            ),
+            locale: provider.locale,
+            supportedLocales: L10n.all,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            home: HomeScreen(),
+          );
+        },
+      );
 }
 
 

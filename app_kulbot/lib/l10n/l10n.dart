@@ -7,10 +7,10 @@ class L10n {
 
   static String getflag(String code) {
     switch (code) {
-      case 'en':
-        return '🇬🇧';
       case 'vi':
         return '🇻🇳';
+      case 'en':
+        return '🇬🇧';
       default:
         return '🇻🇳';
     }
