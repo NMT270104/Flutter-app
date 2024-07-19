@@ -1,68 +1,63 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class ScanqrcodeScreen extends StatefulWidget {
-  const ScanqrcodeScreen({super.key});
-
   @override
-  State<ScanqrcodeScreen> createState() => _ScanqrcodeScreenState();
+  _ScanqrcodeScreenState createState() => _ScanqrcodeScreenState();
 }
 
 class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
-  final GlobalKey QrKey = GlobalKey(debugLabel: "QR");
-  Barcode? result;
-  QRViewController? viewController;
+  List<String> _qrCodes = [];
+
+  Future<void> scanQRcodeOnce() async {
+    String scanData = await FlutterBarcodeScanner.scanBarcode(
+      '#ff6666', 'Cancel', true, ScanMode.QR);
+
+    if (scanData != '-1') { // '-1' indicates that the user cancelled the scan
+      setState(() {
+        _qrCodes.add(scanData);
+      });
+    }
+  }
+
+  Future<void> playQRcodes() async {
+    for (String code in _qrCodes) {
+      _sendMessage(code);
+      await Future.delayed(Duration(milliseconds: 500));
+    }
+    setState(() {
+      _qrCodes.clear(); // Clear the list after sending all messages
+    });
+  }
+
+  void _sendMessage(String message) {
+    // Your implementation for sending the message
+    print(message);
+  }
 
   @override
-  void initState() {
-    super.initState();
-    // Cài đặt cố định màn hình ở chế độ ngang
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-  }
-
-  void dispose() {
-    viewController?.dispose();
-    super.dispose();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        title: Text('QR Code Scanner'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-              flex: 5,
-              child: QRView(key: QrKey, onQRViewCreated: onQRViewCreated)),
-          Expanded(
-            flex: 1,
-            child: (result != null)
-                ? Text("data: ${result!.code}")
-                : Text("Scanning..."),
-          )
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: scanQRcodeOnce,
+              child: Text('Add QR Code'),
+            ),
+            ElevatedButton(
+              onPressed: playQRcodes,
+              child: Text('Play QR Codes'),
+            ),
+            SizedBox(height: 20),
+            Text('Scanned QR Codes: ${_qrCodes.join(', ')}')
+          ],
+        ),
       ),
     );
-  }
-
-  void onQRViewCreated(QRViewController viewController) {
-    this.viewController = viewController;
-    viewController.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-        
-        print(" data: ${result!.code}");
-      });
-    });
   }
 }
