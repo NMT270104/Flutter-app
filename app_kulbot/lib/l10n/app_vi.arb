@@ -1,10 +1,11 @@
 {
   "bascotControl": "điều khiển botcat",
   "carControl": "điều khiển robot xe",
+  "changelanguage": "Thay đổi ngôn ngữ",
   "darkMode": "Chế độ tối",
   "dogControl": "điều khiển robot chó",
+  "home": "Trang chủ",
   "humanControl": "điều khiển robot người",
   "lightMode": "Chế độ sáng",
-  "setting": "Cài đặt",
-  "title": "Trang chủ"
+  "setting": "Cài đặt"
 }

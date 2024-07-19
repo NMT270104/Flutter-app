@@ -85,13 +85,12 @@ class _ProgramingscreenState extends State<Programingscreen> {
         appBar: AppBar(
           title: const Text('Programing'),
         ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () {},
-        //   tooltip: 'Increment',
-        //   child: const Icon(Icons.add),
-        // ),
-        // bottomNavigationBar: const SizedBox(height: 50),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          tooltip: 'Increment',
+          child: const Icon(Icons.add),
+        ),
+        bottomNavigationBar: const SizedBox(height: 50),
       );
     }
   }
-

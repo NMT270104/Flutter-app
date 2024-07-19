@@ -84,6 +84,7 @@ class _BascotcontrolscreenState extends State<Bascotcontrolscreen> {
 
   bool isPressedSound = false;
   bool isPressedLight = false;
+  bool isPressedServo = false;
 
   double _currentSlidevalueTien = 0;
   double _currentSlidevalueLui = 0;
@@ -319,16 +320,38 @@ class _BascotcontrolscreenState extends State<Bascotcontrolscreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             mainAxisSize: MainAxisSize.max,
             children: [
-              GestureHome(
+              GestureDetector(
                 onTap: () {
                   setState(() {
                     isPressedLight = !isPressedLight;
                     isPressedLight == true ? _light() : _endlight();
                   });
                 },
-                color: isPressedLight ? Colors.grey : Colors.green,
-                icon: Icons.tips_and_updates_outlined,
-              ),
+                child: Container(
+                  decoration: BoxDecoration(
+                  color: isPressedLight ? Colors.grey : Colors.green,
+                  borderRadius: BorderRadius.circular(50.0),
+                  ),
+                  padding: EdgeInsets.all(12.0),
+                  child: Icon(Icons.tips_and_updates_outlined),
+                  ),
+                ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isPressedServo = !isPressedServo;
+                    isPressedServo == true ? _light() : _endlight();
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                  color: isPressedServo ? Colors.grey : Colors.green,
+                  borderRadius: BorderRadius.circular(50.0),
+                  ),
+                  padding: EdgeInsets.all(12.0),
+                  child: Icon(Icons.swap_horizontal_circle_outlined),
+                  ),
+                ),
               GestureDetector(
                 onTapDown: (_) {
                   setState(() {

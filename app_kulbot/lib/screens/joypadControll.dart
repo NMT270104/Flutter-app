@@ -1,9 +1,11 @@
+import 'package:TEST/screens/scanQRcodeScreen.dart';
 import 'package:TEST/utils/BluetoothDeviceListEntry.dart';
 import 'package:TEST/utils/GestureHome.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:highlight_text/highlight_text.dart';
@@ -12,6 +14,16 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:showcaseview/showcaseview.dart';
+
+GlobalKey _one = GlobalKey();
+GlobalKey _two = GlobalKey();
+GlobalKey _three = GlobalKey();
+GlobalKey _four = GlobalKey();
+GlobalKey _five = GlobalKey();
+GlobalKey _six = GlobalKey();
+GlobalKey _seven = GlobalKey();
+GlobalKey _eight = GlobalKey();
 
 class JoystickControl extends StatefulWidget {
   final bool checkAvailability;
@@ -108,6 +120,8 @@ class _JoystickControlState extends State<JoystickControl> {
 
   bool isDisconnecting = false;
 
+  String? _scanQRres;
+
   @override
   void initState() {
     super.initState();
@@ -155,7 +169,7 @@ class _JoystickControlState extends State<JoystickControl> {
 
   //hàm kết nối bluetooth
   void _connectToDevice(BluetoothDevice device, BuildContext context) async {
-    if (isConnected) {
+    if (!isConnected) {
       Navigator.of(context).pop();
     }
     try {
@@ -246,6 +260,47 @@ class _JoystickControlState extends State<JoystickControl> {
   }
 
   List<_DeviceWithAvailability> devices = [];
+
+  Future<void> scanQRcodeNormal() async {
+    // scanQRcode 1 lan
+    // String? ScanResult;
+    // try {
+    //   ScanResult = await FlutterBarcodeScanner.scanBarcode(
+    //       '#ff6666', 'Cancel', true, ScanMode.QR);
+    //   print(ScanResult.toString());
+    //   _sendMessage(ScanResult.toString());
+    // } on PlatformException catch (e) {
+    //   print('Error scanning qr: $e');
+    // }
+    // if (!mounted) return;
+    // setState(() {
+    //   _scanQRres = ScanResult;
+    // });
+
+FlutterBarcodeScanner.getBarcodeStreamReceiver(
+      '#ff6666', 
+      'Cancel', 
+      true, 
+      ScanMode.QR
+    )!.listen((scanData) async {
+      // Only process if _scanQRres is null to ensure a delay between scans
+      if (_scanQRres == null || _scanQRres == "S") {
+        setState(() {
+          _scanQRres = scanData;
+        });
+        _sendMessage('${_scanQRres}');
+
+        // Delay for 1 second
+        await Future.delayed(Duration(seconds: 1));
+
+        setState(() {
+          _scanQRres = null; // Clear the data after delay
+          _sendMessage('S');
+        });
+      }
+    });
+  }
+
   @override
   void dispose() {
     // Loại bỏ cài đặt khi StatefulWidget bị hủy
@@ -270,129 +325,222 @@ class _JoystickControlState extends State<JoystickControl> {
   @override
   Widget build(BuildContext context) {
     //final serverName = widget.server?.name ?? "Unknown";
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isConnected
-            ? 'Đã kết nối với robot $connectedDeviceName'
-            : 'Chưa kết nối với robot'),
-        actions: [
-          Container(
-            decoration: BoxDecoration(
-              color:
-                  _bluetoothState.isEnabled ? Colors.blueAccent : Colors.amber,
-              borderRadius: BorderRadius.circular(50.0),
+    return ShowCaseWidget(
+      builder: (context) => Scaffold(
+        appBar: AppBar(
+          title: Text(isConnected
+              ? 'Đã kết nối với robot $connectedDeviceName'
+              : 'Chưa kết nối với robot'),
+          actions: [
+            Showcase(
+              key: _one,
+              description: 'Đây là nút hướng dẫn sử dụng điều khiển robot',
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+                child: IconButton(
+                    icon: Icon(Icons.question_mark_rounded),
+                    onPressed: () {
+                      ShowCaseWidget.of(context).startShowCase([
+                        _one,
+                        _two,
+                        _three,
+                        _four,
+                        _five,
+                        _six,
+                        _seven,
+                        _eight
+                      ]);
+                    }),
+              ),
             ),
-            child: IconButton(
-              icon: _bluetoothState.isEnabled
-                  ? Icon(
-                      isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
-                      color: isConnected ? Colors.green : Colors.red,
-                    )
-                  : Icon(Icons.bluetooth, color: Colors.red),
-              onPressed: () {
-                // _bluetoothState.isEnabled
-                //     ?
-                _startDiscoveryWithTimeout();
-                isConnected ? connection?.dispose() : _connectBluetoothDialog();
-                //: _enableBluetoothAndConnectDialog();
-              },
+            SizedBox(
+              width: 20,
+            ),
+            Showcase(
+              key: _two,
+              description: 'Đây là nút quét mã QR để điều khiển robot',
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+                child: IconButton(
+                    icon: Icon(Icons.qr_code_scanner_outlined),
+                    onPressed: scanQRcodeNormal
+                    // () {
+                    //   Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //           builder: (context) => ScanqrcodeScreen()));
+                    // }
+                    ),
+              ),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Showcase(
+              key: _three,
+              description: 'Bấm vào nút này để bật / tắt bluetooth \n'
+                  'Trong danh sách bluetooth, chọn tên robot cần kết nối \n',
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _bluetoothState.isEnabled
+                      ? Colors.blueAccent
+                      : Colors.amber,
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+                child: IconButton(
+                  icon: _bluetoothState.isEnabled
+                      ? Icon(
+                          isConnected
+                              ? Icons.bluetooth_connected
+                              : Icons.bluetooth,
+                          color: isConnected ? Colors.green : Colors.red,
+                        )
+                      : Icon(Icons.bluetooth, color: Colors.red),
+                  onPressed: () {
+                    // _bluetoothState.isEnabled
+                    //     ?
+                    _startDiscoveryWithTimeout();
+                    isConnected
+                        ? connection?.dispose()
+                        : _connectBluetoothDialog();
+                    //: _enableBluetoothAndConnectDialog();
+                  },
+                ),
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(right: 20)),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Showcase(
+          key: _four,
+          description: 'Bấm vào nút này để điều khiển robot bằng giọng nói',
+          child: AvatarGlow(
+            animate: _isListening,
+            glowColor: Colors.green,
+            duration: const Duration(milliseconds: 2000),
+            repeat: true,
+            child: FloatingActionButton(
+              backgroundColor: Colors.green,
+              onPressed: _listenVoiceToText,
+              child: Icon(_isListening ? Icons.mic : Icons.mic_none),
             ),
           ),
-          Padding(padding: EdgeInsets.only(right: 20)),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: AvatarGlow(
-        animate: _isListening,
-        glowColor: Colors.green,
-        duration: const Duration(milliseconds: 2000),
-        repeat: true,
-        child: FloatingActionButton(
-          backgroundColor: Colors.green,
-          onPressed: _listenVoiceToText,
-          child: Icon(_isListening ? Icons.mic : Icons.mic_none),
         ),
-      ),
-      body:
-          Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            mainAxisSize: MainAxisSize.max,
+        body: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureHome(
-                onTap: () {
-                  setState(() {
-                    isPressedLight = !isPressedLight;
-                    isPressedLight == true ? _light() : _endlight();
-                  });
-                },
-                color: isPressedLight ? Colors.green : Colors.grey,
-                icon: Icons.tips_and_updates_outlined,
-              ),
-              GestureDetector(
-                onTapDown: (_) {
-                  setState(() {
-                    isPressedSound = true;
-                    _sound();
-                  });
-                },
-                onTapUp: (_) {
-                  setState(() {
-                    isPressedSound = false;
-                    _endsound();
-                  });
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: isPressedSound ? Colors.grey : Colors.green,
-                      borderRadius: BorderRadius.circular(50.0)),
-                  padding: EdgeInsets.all(12.0),
-                  child: Icon(Icons.volume_up),
-                ),
-              ),
-            ]),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // joystick left
-            Container(
-              width: 170,
-              height: 170,
-              margin: EdgeInsets.only(bottom: 40, left: 50),
-              alignment: const Alignment(0, 0.8),
-              child: Joystick(
-                  mode: _joystickModeLeft, listener: handleJoystickMove),
-            ),
-            // label voice to textb
-            Column(children: <Widget>[
-              Container(
-                height: MediaQuery.of(context).size.height * 0.5,
-                width: MediaQuery.of(context).size.width * 0.3,
-                //padding: const EdgeInsets.only(30.0, 30.0, 30.0, 150.0),
-                child: TextHighlight(
-                  textAlign: TextAlign.center,
-                  text: voicetotext == '' ? "..." : voicetotext,
-                  words: _highlights,
-                  textStyle: const TextStyle(
-                    fontSize: 32.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400,
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Showcase(
+                      key: _five,
+                      description: 'Bấm vào nút này để bật đèn robot',
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isPressedLight = !isPressedLight;
+                            isPressedLight == true ? _light() : _endlight();
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isPressedLight ? Colors.grey : Colors.green,
+                            borderRadius: BorderRadius.circular(50.0),
+                          ),
+                          padding: EdgeInsets.all(12.0),
+                          child: Icon(Icons.tips_and_updates_outlined),
+                        ),
+                      ),
+                    ),
+                    //Text("Scan results: ${_scanQRres}"),
+                    GestureDetector(
+                      onTapDown: (_) {
+                        setState(() {
+                          isPressedSound = true;
+                          _sound();
+                        });
+                      },
+                      onTapUp: (_) {
+                        setState(() {
+                          isPressedSound = false;
+                          _endsound();
+                        });
+                      },
+                      child: Showcase(
+                        key: _six,
+                        description: 'Bấm vào nút này để bật kèn robot',
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color:
+                                  isPressedSound ? Colors.grey : Colors.green,
+                              borderRadius: BorderRadius.circular(50.0)),
+                          padding: EdgeInsets.all(12.0),
+                          child: Icon(Icons.volume_up),
+                        ),
+                      ),
+                    ),
+                  ]),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // joystick left
+                  Showcase(
+                    key: _seven,
+                    description: 'Đây là nút di chuyển robot',
+                    child: Container(
+                      width: 170,
+                      height: 170,
+                      margin: EdgeInsets.only(bottom: 40, left: 50),
+                      alignment: const Alignment(0, 0.8),
+                      child: Joystick(
+                          mode: _joystickModeLeft,
+                          listener: handleJoystickMove),
+                    ),
                   ),
-                ),
-              ),
+                  // label voice to textb
+                  Column(children: <Widget>[
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      //padding: const EdgeInsets.only(30.0, 30.0, 30.0, 150.0),
+                      child: TextHighlight(
+                        textAlign: TextAlign.center,
+                        text: voicetotext == '' ? "..." : voicetotext,
+                        words: _highlights,
+                        textStyle: const TextStyle(
+                          fontSize: 32.0,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ]),
+                  // joystick right
+                  Showcase(
+                    key: _eight,
+                    description: 'Đây là nút di chuyển robot',
+                    child: Container(
+                      width: 170,
+                      height: 170,
+                      margin: EdgeInsets.only(bottom: 40, right: 50),
+                      alignment: const Alignment(0, 0.8),
+                      child: Joystick(
+                          mode: _joystickModeRight,
+                          listener: handleJoystickMove),
+                    ),
+                  ),
+                ],
+              )
             ]),
-            // joystick right
-            Container(
-              width: 170,
-              height: 170,
-              margin: EdgeInsets.only(bottom: 40, right: 50),
-              alignment: const Alignment(0, 0.8),
-              child: Joystick(
-                  mode: _joystickModeRight, listener: handleJoystickMove),
-            ),
-          ],
-        )
-      ]),
+      ),
     );
   }
 
@@ -522,7 +670,8 @@ class _JoystickControlState extends State<JoystickControl> {
         _speech.listen(
           onResult: (val) => setState(() {
             voicetotext = val.recognizedWords;
-            moveMotor();
+            _sendMessage(voicetotext);
+            //moveMotor();
             print("VoiceToText: $voicetotext");
             // if (val.hasConfidenceRating && val.confidence > 0) {
             //   _confidence = val.confidence;
@@ -542,20 +691,19 @@ class _JoystickControlState extends State<JoystickControl> {
     if (voicetotext.contains('Tiến') ||
         voicetotext.contains('lên') ||
         voicetotext.contains('forward')) {
-      _sendMessage('FF');
+      _sendMessage('f');
     } else if (voicetotext.contains('lui') ||
         voicetotext.contains('lùi') ||
         voicetotext.contains('back')) {
-      _sendMessage('BB');
+      _sendMessage('b');
     } else if (voicetotext.contains('trái') || voicetotext.contains('left')) {
-      _sendMessage('LL');
+      _sendMessage('l');
     } else if (voicetotext.contains('phải') || voicetotext.contains('right')) {
-      _sendMessage('RR');
+      _sendMessage('r');
+    } else if (voicetotext.contains('dừng lại') ||
+        voicetotext.contains('stop')) {
+      _sendMessage('s');
     }
-    else if (voicetotext.contains('dừng lại') || voicetotext.contains('stop')) {
-      _sendMessage('SS');
-    }
-    
   }
 
   //hàm show dialog danh sách các thiết bị bluetooth
@@ -634,12 +782,9 @@ class _JoystickControlState extends State<JoystickControl> {
         print("Lui");
         _sendMessage("BB");
       }
-    
-    }
-    else if (_x == 100 && _y ==100){
+    } else if (_x == 100 && _y == 100) {
       _sendMessage("SS");
-    }
-     else {
+    } else {
       if (_x < 100) {
         print("Trai");
         _sendMessage("LL");
@@ -648,7 +793,7 @@ class _JoystickControlState extends State<JoystickControl> {
         _sendMessage("RR");
       }
     }
-    // Tạo một đối tượng JSON
+    // //Tạo một đối tượng JSON
     // Map<String, dynamic> jsonData = {
     //   'command': message,
     //   'x': _x.toStringAsFixed(2), // Đưa _x về dạng chuỗi với 2 chữ số thập phân

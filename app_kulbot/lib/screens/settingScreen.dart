@@ -9,6 +9,7 @@ import 'package:TEST/provider/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+
 class settingScreen extends StatefulWidget {
   settingScreen({super.key});
 
@@ -44,7 +45,7 @@ class _settingScreenState extends State<settingScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Settings"),
+        title: Text(AppLocalizations.of(context)!.setting),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 20),
@@ -67,7 +68,7 @@ class _settingScreenState extends State<settingScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Change Language",
+                    AppLocalizations.of(context)!.changelanguage,
                     style: TextStyle(fontSize: 16),
                   ),
                   DropdownButtonHideUnderline(

@@ -3,6 +3,7 @@ import 'package:TEST/screens/TFliteCameraScreen.dart';
 import 'package:TEST/screens/bascotControlScreen.dart';
 import 'package:TEST/screens/dogControlScreen.dart';
 import 'package:TEST/screens/humanControlScreen.dart';
+import 'package:TEST/screens/iotScreen.dart';
 import 'package:TEST/screens/joypadControll.dart';
 import 'package:TEST/screens/programingScreen.dart';
 import 'package:TEST/screens/settingScreen.dart';
@@ -35,14 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void dispose() {}
 
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Home"),
+        title: Text(AppLocalizations.of(context)!.home),
       ),
       body: Container(
         margin: EdgeInsets.only(top: 50),
@@ -61,9 +61,13 @@ class _HomeScreenState extends State<HomeScreen> {
               navigator: JoystickControl(),
             ),
             ButtonHomeScreen(
-              imgPath: 'lib/assets/images/car.jpg',
+              imgPath: 'lib/assets/images/Bascot_16.png',
               textButton: AppLocalizations.of(context)!.bascotControl,
               navigator: Bascotcontrolscreen(),
+            ),ButtonHomeScreen(
+              imgPath: 'lib/assets/images/iot.png',
+              textButton: "IoT",
+              navigator: Iotscreen(),
             ),
             ButtonHomeScreen(
               imgPath: 'lib/assets/images/black_edit_icon.png',
