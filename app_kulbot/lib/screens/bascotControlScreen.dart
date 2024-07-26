@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:highlight_text/highlight_text.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -144,10 +145,11 @@ class _BascotcontrolscreenState extends State<Bascotcontrolscreen> {
       });
     });
 
+requestLocationPermission().then((_) {
     if (widget.checkAvailability) {
       _startDiscoveryWithTimeout();
     }
-
+});
     _getBondedDevices();
     _checkBluetoothStatus();
 
@@ -188,6 +190,20 @@ class _BascotcontrolscreenState extends State<Bascotcontrolscreen> {
       print('Error connecting to device: $e');
     }
   }
+
+// Một hàm để yêu cầu quyền truy cập vị trí
+Future<void> requestLocationPermission() async {
+  var status = await Permission.location.request();
+  if (status.isGranted) {
+    // Quyền truy cập vị trí được cấp
+  } else if (status.isDenied) {
+    // Quyền truy cập vị trí bị từ chối
+  } else if (status.isPermanentlyDenied) {
+    // Quyền truy cập vị trí bị từ chối vĩnh viễn, mở cài đặt ứng dụng
+    openAppSettings();
+  }
+}
+
 
   // Hàm này bắt đầu quá trình tìm kiếm thiết bị Bluetooth mới.
 // Khi một thiết bị mới được phát hiện, nó được thêm vào danh sách devices nếu chưa tồn tại trong danh sách.

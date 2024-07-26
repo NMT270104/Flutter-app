@@ -20,6 +20,8 @@ class DetectorWidget extends StatefulWidget {
 
 class _DetectorWidgetState extends State<DetectorWidget>
     with WidgetsBindingObserver {
+
+    final String targetValue = "bottle";
   /// List of available cameras
   late List<CameraDescription> cameras;
 
@@ -59,11 +61,42 @@ class _DetectorWidgetState extends State<DetectorWidget>
           setState(() {
             results = values['recognitions'];
             stats = values['stats'];
+
+             if (results != null && results!.any((recognition) => recognition.label == targetValue)) {
+          _stopDetectionAndDisplayResult();
+        } else {
+          setState(() {});
+        }
           });
         });
       });
     });
   }
+
+  void _stopDetectionAndDisplayResult() {
+  // _cameraController?.stopImageStream();
+  // _detector?.stop();
+  // _subscription?.cancel();
+  
+  // Optionally display the result or perform some action
+  setState(() {
+    // You can set some state to show the detected value or navigate to another screen
+    // For example, show an alert dialog or update the UI with the detected value
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Target Detected'),
+        content: Text('The target value "$targetValue" was detected!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  });
+}
 
   /// Initializes the camera by setting [_cameraController]
   void _initializeCamera() async {
