@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class ScanqrcodeScreen extends StatefulWidget {
+  final Function(String) onScanComplete;
+
+  ScanqrcodeScreen({required this.onScanComplete});
+
   @override
   _ScanqrcodeScreenState createState() => _ScanqrcodeScreenState();
 }
@@ -19,6 +23,7 @@ class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
       // '-1' indicates that the user cancelled the scan
       setState(() {
         _qrCodes.add(scanData);
+        
       });
     }
   }
@@ -32,15 +37,15 @@ class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
       if (_scanQRres == null || _scanQRres == "S") {
         setState(() {
           _scanQRres = scanData;
+          widget.onScanComplete(scanData);
         });
-        _sendMessage('${_scanQRres}');
 
         // Delay for 1 second
         await Future.delayed(Duration(seconds: 1));
 
         setState(() {
           _scanQRres = null; // Clear the data after delay
-          _sendMessage('S');
+          widget.onScanComplete('S');
         });
       }
     });
@@ -49,17 +54,12 @@ class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
   // Hàm chơi tất cả các QR đã quét được lưu trong _qrCodes
   Future<void> playQRcodes() async {
     for (String code in _qrCodes) {
-      _sendMessage(code);
-      await Future.delayed(Duration(milliseconds: 500));
+      widget.onScanComplete(code);
+      await Future.delayed(Duration(milliseconds: 1000));
     }
     setState(() {
       _qrCodes.clear(); // Clear the list after sending all messages
     });
-  }
-
-  void _sendMessage(String message) {
-    // Your implementation for sending the message
-    print(message);
   }
 
   @override
@@ -78,11 +78,11 @@ class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
             ),
             ElevatedButton(
               onPressed: scanQRcodeOnce,
-              child: Text('Add QR Code'),
+              child: Text('Add QR Code '),
             ),
             ElevatedButton(
               onPressed: playQRcodes,
-              child: Text('Play QR Codes'),
+              child: Text('Play QR Codes 📤'),
             ),
             SizedBox(height: 20),
             Text('Scanned QR Codes: ${_qrCodes.join(', ')}')

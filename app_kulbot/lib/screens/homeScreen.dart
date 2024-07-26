@@ -13,6 +13,7 @@ import 'package:TEST/utils/ButtonHomeScreen.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _moveForwardCommand = 'FF';
+  String _moveBackwardCommand = 'BB';
+
   AudioPlayer? _audioPlayer;
 
   @override
@@ -66,6 +70,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Phát file nhạc từ thư mục tạm thời
     await _audioPlayer?.play(DeviceFileSource(tempFile.path));
+  }
+
+  Future<void> _loadSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _moveForwardCommand = prefs.getString('moveForward') ?? 'FF';
+      _moveBackwardCommand = prefs.getString('moveBackward') ?? 'BB';
+    });
   }
 
   @override
@@ -125,7 +137,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ButtonHomeScreen(
               imgPath: 'lib/assets/images/setting.png',
               textButton: AppLocalizations.of(context)!.setting,
-              navigator: settingScreen(),
+              navigator: settingScreen(
+                onSendMessage: (String message) {
+                  _loadSettings();
+                },
+              ),
             ),
           ],
         ),
