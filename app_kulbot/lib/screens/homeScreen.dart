@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:TEST/main.dart';
-import 'package:TEST/screens/TFliteCameraScreen.dart';
-import 'package:TEST/screens/bascotControlScreen.dart';
-import 'package:TEST/screens/dogControlScreen.dart';
-import 'package:TEST/screens/humanControlScreen.dart';
-import 'package:TEST/screens/iotScreen.dart';
-import 'package:TEST/screens/joypadControll.dart';
-import 'package:TEST/screens/programingScreen.dart';
-import 'package:TEST/screens/settingScreen.dart';
-import 'package:TEST/utils/ButtonHomeScreen.dart';
+import 'package:Kulbot/main.dart';
+import 'package:Kulbot/screens/TFliteCameraScreen.dart';
+import 'package:Kulbot/screens/bascotControlScreen.dart';
+import 'package:Kulbot/screens/dogControlScreen.dart';
+import 'package:Kulbot/screens/humanControlScreen.dart';
+import 'package:Kulbot/screens/iotScreen.dart';
+import 'package:Kulbot/screens/carControll.dart';
+import 'package:Kulbot/screens/programingScreen.dart';
+import 'package:Kulbot/screens/settingScreen.dart';
+import 'package:Kulbot/utils/ButtonHomeScreen.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:TEST/provider/provider.dart';
+import 'package:Kulbot/provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -72,13 +72,13 @@ class _HomeScreenState extends State<HomeScreen> {
     await _audioPlayer?.play(DeviceFileSource(tempFile.path));
   }
 
-  Future<void> _loadSettings() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _moveForwardCommand = prefs.getString('moveForward') ?? 'FF';
-      _moveBackwardCommand = prefs.getString('moveBackward') ?? 'BB';
-    });
-  }
+  // Future<void> _loadSettings() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     _moveForwardCommand = prefs.getString('moveForward') ?? 'FF';
+  //     _moveBackwardCommand = prefs.getString('moveBackward') ?? 'BB';
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ButtonHomeScreen(
               imgPath: 'lib/assets/images/car.jpg',
               textButton: AppLocalizations.of(context)!.carControl,
-              navigator: JoystickControl(),
+              navigator: CarControl(),
             ),
             ButtonHomeScreen(
               imgPath: 'lib/assets/images/Bascot_16.png',
@@ -138,9 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
               imgPath: 'lib/assets/images/setting.png',
               textButton: AppLocalizations.of(context)!.setting,
               navigator: settingScreen(
-                onSendMessage: (String message) {
-                  _loadSettings();
-                },
               ),
             ),
           ],

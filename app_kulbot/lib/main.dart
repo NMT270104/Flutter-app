@@ -1,6 +1,6 @@
-import 'package:TEST/l10n/l10n.dart';
-import 'package:TEST/provider/provider.dart';
-import 'package:TEST/screens/homeScreen.dart';
+import 'package:Kulbot/l10n/l10n.dart';
+import 'package:Kulbot/provider/provider.dart';
+import 'package:Kulbot/screens/homeScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -64,11 +64,12 @@ class SplashState extends StatefulWidget {
   const SplashState({super.key});
 
   @override
-  State<SplashState> createState() => _SplashStateState();
+  State<SplashState> createState() => _SplashStaKulbotate();
+  
 }
 
 
-class _SplashStateState extends State<SplashState> {
+class _SplashStaKulbotate extends State<SplashState> {
   @override
   void initState() {
     // TODO: implement initState
@@ -82,7 +83,6 @@ class _SplashStateState extends State<SplashState> {
       DeviceOrientation.landscapeRight,
     ]);
   }
-
   @override
   Widget build(BuildContext context) {
       return Scaffold(
@@ -101,8 +101,6 @@ class _SplashStateState extends State<SplashState> {
               else
               const CircularProgressIndicator(
                 color: Colors.white,)
-              
-
           ],
         ),
       ),

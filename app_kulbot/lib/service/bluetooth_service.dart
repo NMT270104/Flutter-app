@@ -26,7 +26,8 @@ class BluetoothService {
   String _name = "...";
   String connectedDeviceName = "...";
   bool isDisconnecting = false;
-  FlutterBluetoothSerial flutterBluetoothSerial = FlutterBluetoothSerial.instance;
+  FlutterBluetoothSerial flutterBluetoothSerial =
+      FlutterBluetoothSerial.instance;
   BluetoothConnection? connection;
   List<_DeviceWithAvailability> devices = [];
 

@@ -3,16 +3,18 @@ import 'dart:isolate';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:TEST/models/recognition.dart';
-import 'package:TEST/models/screen_params.dart';
-import 'package:TEST/service/detector_service.dart';
-import 'package:TEST/widgets/box_widget.dart';
-import 'package:TEST/widgets/stats_widget.dart';
+import 'package:Kulbot/models/recognition.dart';
+import 'package:Kulbot/models/screen_params.dart';
+import 'package:Kulbot/service/detector_service.dart';
+import 'package:Kulbot/widgets/box_widget.dart';
+import 'package:Kulbot/widgets/stats_widget.dart';
 
 /// [DetectorWidget] sends each frame for inference
 class DetectorWidget extends StatefulWidget {
+  final detectorvalue;
+
   /// Constructor
-  const DetectorWidget({super.key});
+  const DetectorWidget({super.key, required this.detectorvalue});
 
   @override
   State<DetectorWidget> createState() => _DetectorWidgetState();
@@ -21,7 +23,6 @@ class DetectorWidget extends StatefulWidget {
 class _DetectorWidgetState extends State<DetectorWidget>
     with WidgetsBindingObserver {
 
-    final String targetValue = "bottle";
   /// List of available cameras
   late List<CameraDescription> cameras;
 
@@ -62,11 +63,13 @@ class _DetectorWidgetState extends State<DetectorWidget>
             results = values['recognitions'];
             stats = values['stats'];
 
-             if (results != null && results!.any((recognition) => recognition.label == targetValue)) {
-          _stopDetectionAndDisplayResult();
-        } else {
-          setState(() {});
-        }
+            if (results != null &&
+                results!
+                    .any((recognition) => recognition.label == widget.detectorvalue)) {
+              _stopDetectionAndDisplayResult();
+            } else {
+              setState(() {});
+            }
           });
         });
       });
@@ -74,29 +77,29 @@ class _DetectorWidgetState extends State<DetectorWidget>
   }
 
   void _stopDetectionAndDisplayResult() {
-  // _cameraController?.stopImageStream();
-  // _detector?.stop();
-  // _subscription?.cancel();
-  
-  // Optionally display the result or perform some action
-  setState(() {
-    // You can set some state to show the detected value or navigate to another screen
-    // For example, show an alert dialog or update the UI with the detected value
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Target Detected'),
-        content: Text('The target value "$targetValue" was detected!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  });
-}
+    // _cameraController?.stopImageStream();
+    // _detector?.stop();
+    // _subscription?.cancel();
+
+    // Optionally display the result or perform some action
+    setState(() {
+      // You can set some state to show the detected value or navigate to another screen
+      // For example, show an alert dialog or update the UI with the detected value
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Target Detected'),
+          content: Text('The target value "${widget.detectorvalue}" was detected!'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    });
+  }
 
   /// Initializes the camera by setting [_cameraController]
   void _initializeCamera() async {
@@ -107,7 +110,7 @@ class _DetectorWidgetState extends State<DetectorWidget>
       ResolutionPreset.medium,
       enableAudio: false,
     )..initialize().then((_) async {
-        await _controller.startImageStream(onLatestImageAvailable);
+        await _controller.startImageStream(onLaKulbotImageAvailable);
         setState(() {});
 
         /// previewSize is size of each image frame captured by controller
@@ -171,7 +174,7 @@ class _DetectorWidgetState extends State<DetectorWidget>
   }
 
   /// Callback to receive each frame [CameraImage] perform inference on it
-  void onLatestImageAvailable(CameraImage cameraImage) async {
+  void onLaKulbotImageAvailable(CameraImage cameraImage) async {
     _detector?.processFrame(cameraImage);
   }
 

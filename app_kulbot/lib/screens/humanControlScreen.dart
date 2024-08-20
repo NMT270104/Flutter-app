@@ -1,5 +1,5 @@
-import 'package:TEST/utils/BluetoothDeviceListEntry.dart';
-import 'package:TEST/utils/GestureHome.dart';
+import 'package:Kulbot/utils/BluetoothDeviceListEntry.dart';
+import 'package:Kulbot/utils/GestureButton.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

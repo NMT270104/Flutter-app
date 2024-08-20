@@ -10,8 +10,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as image_lib;
-import 'package:TEST/models/recognition.dart';
-import 'package:TEST/utils/image_utils.dart';
+import 'package:Kulbot/models/recognition.dart';
+import 'package:Kulbot/utils/image_utils.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
 ///////////////////////////////////////////////////////////////////////////////

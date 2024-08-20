@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:TEST/models/recognition.dart';
+import 'package:Kulbot/models/recognition.dart';
 
 /// Individual bounding box
 class BoxWidget extends StatelessWidget {

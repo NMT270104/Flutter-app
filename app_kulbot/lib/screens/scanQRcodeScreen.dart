@@ -28,28 +28,33 @@ class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
     }
   }
 
-  // hàm quét  QR dạng stream và gửi data liên tục
+  // hàm quét  QR dạng stream và gửi data 
   Future<void> scanQRcodeStream() async {
-    FlutterBarcodeScanner.getBarcodeStreamReceiver(
-            '#ff6666', 'Cancel', true, ScanMode.QR)!
-        .listen((scanData) async {
-      // Only process if _scanQRres is null to ensure a delay between scans
-      if (_scanQRres == null || _scanQRres == "S") {
-        setState(() {
-          _scanQRres = scanData;
-          widget.onScanComplete(scanData);
-        });
+  bool isScanning = false; // Biến theo dõi trạng thái quét
 
-        // Delay for 1 second
-        await Future.delayed(Duration(seconds: 1));
+  FlutterBarcodeScanner.getBarcodeStreamReceiver(
+          '#ff6666', 'Cancel', true, ScanMode.QR)!
+      .listen((scanData) async {
+    if (!isScanning) {
+      isScanning = true; // Đặt trạng thái quét là đang quét
 
-        setState(() {
-          _scanQRres = null; // Clear the data after delay
-          widget.onScanComplete('S');
-        });
-      }
-    });
-  }
+      setState(() {
+        _scanQRres = scanData;
+        widget.onScanComplete(scanData);
+      });
+
+      // Delay for 1 second để đảm bảo quét xong
+      await Future.delayed(Duration(seconds: 1));
+
+      setState(() {
+        _scanQRres = null; // Xóa dữ liệu sau khi delay
+      });
+
+      isScanning = false; // Đặt lại trạng thái quét
+    }
+  });
+}
+
 
   // Hàm chơi tất cả các QR đã quét được lưu trong _qrCodes
   Future<void> playQRcodes() async {

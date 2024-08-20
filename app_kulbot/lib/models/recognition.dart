@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:TEST/models/screen_params.dart';
+import 'package:Kulbot/models/screen_params.dart';
 
 /// Represents the recognition output from the model
 class Recognition {
