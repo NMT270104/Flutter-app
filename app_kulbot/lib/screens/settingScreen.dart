@@ -124,17 +124,17 @@ class _settingScreenState extends State<settingScreen> {
           padding: const EdgeInsets.only(left: 20),
           child: Column(
             children: [
-              SwitchListTile(
-                title: Text(
-                  themeNotifier.isDarkMode
-                      ? AppLocalizations.of(context)!.darkMode
-                      : AppLocalizations.of(context)!.lightMode,
-                ),
-                value: themeNotifier.isDarkMode,
-                onChanged: (bool value) {
-                  themeNotifier.toggleTheme();
-                },
-              ),
+              // SwitchListTile(
+              //   title: Text(
+              //     themeNotifier.isDarkMode
+              //         ? AppLocalizations.of(context)!.darkMode
+              //         : AppLocalizations.of(context)!.lightMode,
+              //   ),
+              //   value: themeNotifier.isDarkMode,
+              //   onChanged: (bool value) {
+              //     themeNotifier.toggleTheme();
+              //   },
+              // ),
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 child: Row(

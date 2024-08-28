@@ -5,7 +5,7 @@ import 'package:Kulbot/screens/TFliteCameraScreen.dart';
 import 'package:Kulbot/screens/bascotControlScreen.dart';
 import 'package:Kulbot/screens/dogControlScreen.dart';
 import 'package:Kulbot/screens/humanControlScreen.dart';
-import 'package:Kulbot/screens/iotScreen.dart';
+import 'package:Kulbot/screens/iot_screen/iotScreen.dart';
 import 'package:Kulbot/screens/carControll.dart';
 import 'package:Kulbot/screens/programingScreen.dart';
 import 'package:Kulbot/screens/settingScreen.dart';
@@ -42,12 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    _audioPlayer = AudioPlayer();
-    _playMusic();
+    // _audioPlayer = AudioPlayer();
+    // _playMusic();
 
-    _audioPlayer?.onPlayerComplete.listen((event) {
-      _playMusic();
-    });
+    // _audioPlayer?.onPlayerComplete.listen((event) {
+    //   _playMusic();
+    // });
   }
 
   @override
@@ -80,6 +80,30 @@ class _HomeScreenState extends State<HomeScreen> {
   //   });
   // }
 
+  void _navigateToScreen(BuildContext context, Widget screen) {
+  Navigator.of(context).push(
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => screen,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        // You can use different transitions; here is a scale transition example
+        const begin = 0.0;
+        const end = 1.0;
+        const curve = Curves.easeInOut;
+
+        final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        final scaleAnimation = animation.drive(tween);
+
+        return ScaleTransition(
+          scale: scaleAnimation,
+          child: child,
+        );
+      },
+    ),
+  );
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
@@ -88,59 +112,59 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         title: Text(AppLocalizations.of(context)!.home),
       ),
-      body: Container(
-        margin: EdgeInsets.only(top: 50),
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: CarouselSlider(
-          options: CarouselOptions(
-            aspectRatio: 16 / 9,
-            enlargeCenterPage: true,
-            viewportFraction: 1,
-          ),
-          items: [
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/car.jpg',
-              textButton: AppLocalizations.of(context)!.carControl,
-              navigator: CarControl(),
+      body: Flexible(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: CarouselSlider(
+            options: CarouselOptions(
+              aspectRatio: 16 / 9,
+              enlargeCenterPage: true,
+              viewportFraction: 1,
             ),
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/Bascot_16.png',
-              textButton: AppLocalizations.of(context)!.bascotControl,
-              navigator: Bascotcontrolscreen(),
-            ),
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/iot.png',
-              textButton: "IoT",
-              navigator: Iotscreen(),
-            ),
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/black_edit_icon.png',
-              textButton: 'Programing',
-              navigator: Programingscreen(),
-            ),
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/kulbot.png',
-              textButton: AppLocalizations.of(context)!.humanControl,
-              navigator: humanControl(),
-            ),
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/TFlogo.png',
-              textButton: 'TFlite Camera',
-              navigator: TFliteCamera(),
-            ),
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/robothead.png',
-              textButton: AppLocalizations.of(context)!.dogControl,
-              navigator: dogControl(),
-            ),
-            ButtonHomeScreen(
-              imgPath: 'lib/assets/images/setting.png',
-              textButton: AppLocalizations.of(context)!.setting,
-              navigator: settingScreen(
+            items: [
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/car.jpg',
+                textButton: AppLocalizations.of(context)!.carControl,
+                navigator: () => _navigateToScreen(context, const CarControl()),
               ),
-            ),
-          ],
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/Bascot_16.png',
+                textButton: AppLocalizations.of(context)!.bascotControl,
+                navigator: () => _navigateToScreen(context, const Bascotcontrolscreen()),
+              ),
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/iot.png',
+                textButton: "IoT",
+                navigator: () => _navigateToScreen(context, const Iotscreen()),
+              ),
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/black_edit_icon.png',
+                textButton: 'Programing',
+                navigator: () => _navigateToScreen(context,  Programingscreen()),
+              ),
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/kulbot.png',
+                textButton: AppLocalizations.of(context)!.humanControl,
+                navigator: () => _navigateToScreen(context,  humanControl()),
+              ),
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/TFlogo.png',
+                textButton: 'TFlite Camera',
+                navigator: () => _navigateToScreen(context,  TFliteCamera()),
+              ),
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/robothead.png',
+                textButton: AppLocalizations.of(context)!.dogControl,
+                navigator: () => _navigateToScreen(context,  dogControl()),
+              ),
+              ButtonHomeScreen(
+                imgPath: 'lib/assets/images/setting.png',
+                textButton: AppLocalizations.of(context)!.setting,
+                navigator: () => _navigateToScreen(context,  settingScreen()),
+              ),
+            ],
+          ),
         ),
       ),
     );

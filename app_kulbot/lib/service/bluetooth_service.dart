@@ -163,15 +163,16 @@ class BluetoothService {
             'Bluetooth ',
             style: TextStyle(fontSize: 20, color: Colors.black),
           ),
-          content: _bluetoothState.isEnabled
+          content: _bluetoothState.isEnabled && devices.isNotEmpty
               ? buildDevicesListView(context)
-              : Text("Bluetooth chưa được bật")),
+              : Text("Không tìm thấy thiết bị hoặc chưa bật bluetooth")),
     );
   }
 
   Widget buildDevicesListView(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    
     List<Widget> list = devices
         .map((_device) => ListTile(
               title: Text(_device.device.name ?? "Unknown"),
@@ -190,7 +191,7 @@ class BluetoothService {
       color: Colors.grey[50],
       width: screenWidth * 1,
       height: screenHeight * 0.50,
-      child: ListView(children: list),
+      child: ListView(children:list  ),
     );
   }
 

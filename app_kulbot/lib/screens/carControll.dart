@@ -1,8 +1,6 @@
 import 'package:Kulbot/screens/scanQRcodeScreen.dart';
-import 'package:Kulbot/screens/settingScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:highlight_text/highlight_text.dart';
@@ -92,8 +90,6 @@ class _CarControlState extends State<CarControl> {
 
   List<_Message> messages = [];
 
-  final TextEditingController textEditingController = TextEditingController();
-  final ScrollController listScrollController = ScrollController();
 
   bool get isConnected => (_bluetoothService.connection?.isConnected ?? false);
 
@@ -475,11 +471,13 @@ class _CarControlState extends State<CarControl> {
 
   void handleHorizontalJoystickMove(details) {
     _x = 100.0 + 10 * details.x;
+        print("x: $_x");
     determineMovement();
   }
 
   void handleVerticalJoystickMove(details) {
     _y = 100.0 + 10 * details.y;
+    print("y: $_y");
     determineMovement();
   }
 

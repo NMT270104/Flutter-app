@@ -39,6 +39,9 @@ dependencies:
   audioplayers: ^6.0.0
   shared_preferences: ^2.2.3
   fluttertoast: ^8.2.6
+  webview_flutter_plus: ^0.4.7
+  sleek_circular_slider: ^2.0.1
+  animated_toggle_switch: ^0.8.3
 
   
 
@@ -67,5 +70,6 @@ flutter:
     - lib/assets/images/
     - lib/assets/music/
     - assets/models/
+    - assets/blockly/
 
  

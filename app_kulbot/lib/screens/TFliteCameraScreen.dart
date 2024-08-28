@@ -51,6 +51,12 @@ void initState() {
       key: GlobalKey(),
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios, color: Colors.white, size:18, ), 
+        onPressed: () {
+          Navigator.pop(context); 
+          
+        },),
         title: Text("TensorFlow Camera"),
         actions: [
           Container(
