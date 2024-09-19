@@ -48,7 +48,7 @@ const Map<String, dynamic> newState = {
 const Map<String, dynamic> initialToolboxJson = {
   'kind': 'categoryToolbox',
   'contents': [
-   
+  //Events
     {
       "kind": "category",
       "name": "Events",
@@ -69,15 +69,57 @@ const Map<String, dynamic> initialToolboxJson = {
         },
         {
           'kind': 'block',
-          'type': "event_wait"
-        },
-        {
-          'kind': 'block',
           'type': "logic_boolean_workaround"
         }
       ]
     },
+  //Control
+  {
+    'kind': 'category',
+    'name': 'Control',
+    'colour': 210,
+    'contents': [
+      {
+        'kind': 'block',
+        'type': 'wait_seconds',
+        
+      },
+      {
+        'kind': 'block',
+        'type': 'controls_repeat'
+      },
+      {
+        'kind': 'block',
+        'type': 'controls_forever'
+      },
+      {
+          'kind': 'block',
+          'type': 'controls_if',
+      },
+      {
+        'kind': 'block',
+        'type': 'wait_until'
+      },
+      {
+        'kind': 'block',
+        'type': 'controls_repeat_until'
+      }
 
+    ]
+      },
+  
+  {
+    'kind': 'category',
+    'name': 'Variables',
+    'colour': 160,
+    'contents': [
+      {
+        'kind': 'block',
+        'type': 'define_variable',
+      }
+      ],
+  },
+  //Led
     {
       "kind": 'category',
       'name': 'Led',
@@ -125,12 +167,24 @@ const Map<String, dynamic> initialToolboxJson = {
         }
         ]
     },
-    
+  //Sensor
     {
       'kind':'category',
       'name': 'Sensor',
       'colour': 130,
       'contents': [
+        {
+          'kind':'block',
+          'type':'get_unltra'
+        },
+        {
+          'kind': 'block',
+          'type':'get_line'
+        },
+        {
+          'kind': 'block',
+          'type':'get_ir'
+        },
         {
           'kind': 'block',
           'type':'get_tem'
@@ -138,6 +192,30 @@ const Map<String, dynamic> initialToolboxJson = {
         {
           'kind': 'block',
           'type':'get_hum'
+        },
+        {
+          'kind': 'block',
+          'type':'get_soil_hum'
+        },
+        {
+          'kind': 'block',
+          'type':'get_gas'
+        },
+        {
+          'kind': 'block',
+          'type':'get_touch'
+        },
+        {
+          'kind': 'block',
+          'type':'get_gryro'
+        },
+        {
+          'kind': 'block',
+          'type':'get_color'
+        },
+        {
+          'kind': 'block',
+          'type':'get_lux'
         }
       ]
         

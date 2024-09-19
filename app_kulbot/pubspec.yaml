@@ -71,7 +71,6 @@ flutter:
   assets:
     - lib/assets/images/
     - lib/assets/music/
-    - assets/models/
     - assets/scratch/
     - assets/scratch/blocks/
     - assets/scratch/index.html

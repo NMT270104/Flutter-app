@@ -4,7 +4,7 @@
 Blockly.defineBlocksWithJsonArray([
     {
         "type": "event_program_starts",
-        "message0": "when program starts",
+        "message0": "when Kulbot begin",
         //"message1": "%1",
         "args1": [
           {"type": "input_statement", "name": "DO", "flip_rtl": true}
@@ -45,22 +45,7 @@ Blockly.defineBlocksWithJsonArray([
         "colour": 65
       }
        ,
-      {
-        "type": "event_wait",
-        "message0": "wait %1 milliseconds",
-        "inputsInline": true,
-        "args0": [
-          {
-            "type": "input_value",
-            "name": "TIMEOUT",
-            "check": "Number"
-          }
-        ],
-        "previousStatement": "Action",
-        "nextStatement": "Action",
-        "colour": 120
-      }
-      ,
+      
       {
         "type": "logic_boolean_workaround",
         "message0": "\u00A0%1",
@@ -79,8 +64,11 @@ Blockly.defineBlocksWithJsonArray([
       }
   ]);
 
-  sampleGenerator.forBlock['event_program_starts'] = function(block, generator) {
-    return 'my code string';
+  jsonGenerator.forBlock['event_program_starts'] = function(block, generator) {
+    const name = "b";
+    const value = "a";
+    const code = `"${name}": ${value}`;
+    return code;
   };
 
   // Blockly.JavaScript['event_program_starts'] = function(block) {
