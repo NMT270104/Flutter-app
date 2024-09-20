@@ -109,7 +109,8 @@ class _ProgramingscreenState extends State<Programingscreen> {
     try {
       addons.add(await rootBundle.loadString('assets/scratch/blocks/events_generators.js'));
       addons.add(await rootBundle.loadString('assets/scratch/blocks/control.js'));
-      addons.add(await rootBundle.loadString('assets/scratch/blocks/variables.js'));
+      addons.add(await rootBundle.loadString('assets/scratch/blocks/display.js'));
+      // addons.add(await rootBundle.loadString('assets/scratch/blocks/variables.js'));
       addons.add(await rootBundle.loadString('assets/scratch/blocks/led.js'));
       addons.add(await rootBundle.loadString('assets/scratch/blocks/sensor.js'));
       Fluttertoast.showToast(msg: "Loaded addons successfully");
@@ -150,22 +151,22 @@ class _ProgramingscreenState extends State<Programingscreen> {
           },
         ),
             ),
-            Container(
-              width: 150,
-              height: 330,
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8.0),
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Text(
-                  _generatedCode,
-                  style: const TextStyle(fontSize: 14, fontFamily: 'Monospace'),
-                ),
-              ),
-            ),
+            // Container(
+            //   width: 150,
+            //   height: 330,
+            //   padding: const EdgeInsets.all(8.0),
+            //   decoration: BoxDecoration(
+            //     border: Border.all(color: Colors.grey),
+            //     borderRadius: BorderRadius.circular(8.0),
+            //     color: Colors.white,
+            //   ),
+            //   child: SingleChildScrollView(
+            //     child: Text(
+            //       _generatedCode,
+            //       style: const TextStyle(fontSize: 14, fontFamily: 'Monospace'),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

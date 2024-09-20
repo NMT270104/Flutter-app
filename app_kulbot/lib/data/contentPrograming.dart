@@ -80,13 +80,32 @@ const Map<String, dynamic> initialToolboxJson = {
     'colour': 210,
     'contents': [
       {
-        'kind': 'block',
-        'type': 'wait_seconds',
-        
+        "kind": "block",
+        "type": "wait_seconds",
+        "inputs": {
+          "TIMEOUT": {
+            "shadow": {
+              "type": "math_number",  // Hoặc "math_integer"
+              "fields": {
+                "NUM": 1
+              }
+            }
+          }
+        }
       },
       {
         'kind': 'block',
-        'type': 'controls_repeat'
+        'type': 'controls_repeat',
+        "inputs": {
+          "TIMES": {
+            "shadow": {
+              "type": "math_number",  // Hoặc "math_integer"
+              "fields": {
+                "NUM": 0
+              }
+            }
+          }
+        }
       },
       {
         'kind': 'block',
@@ -106,18 +125,78 @@ const Map<String, dynamic> initialToolboxJson = {
       }
 
     ]
-      },
+    },
   
   {
     'kind': 'category',
-    'name': 'Variables',
-    'colour': 160,
+    'name': 'Display',
+    'colour': 230,
     'contents': [
       {
         'kind': 'block',
-        'type': 'define_variable',
+        'type': 'lcd_print_number',
+        "inputs": {
+          "COLUMN": {
+            "shadow": {
+              "type": "math_number",  // Hoặc "math_integer"
+              "fields": {
+                "NUM": 0
+              }
+            }
+          },
+          "CELL": {
+            "shadow": {
+              "type": "math_number",  // Hoặc "math_integer"
+              "fields": {
+                "NUM": 0
+              }
+            }
+          },
+          "NUMBER": {
+            "shadow": {
+              "type": "math_number",  // Hoặc "math_integer"
+              "fields": {
+                "NUM": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        'kind': 'block',
+        'type': 'lcd_print_str',
+        "inputs": {
+          "COLUMN": {
+            "shadow": {
+              "type": "math_number",  // Hoặc "math_integer"
+              "fields": {
+                "NUM": 0
+              }
+            }
+          },
+          "CELL": {
+            "shadow": {
+              "type": "math_number",  // Hoặc "math_integer"
+              "fields": {
+                "NUM": 0
+              }
+            }
+          },
+          "STRING": {
+            "shadow": {
+              "type": "text",  
+              "fields": {
+                "TEXT": "Hello!!!"
+              }
+            }
+          }
+        }
+      },
+      {
+        'kind': 'block',
+        'type': 'lcd_clear'
       }
-      ],
+    ]
   },
   //Led
     {

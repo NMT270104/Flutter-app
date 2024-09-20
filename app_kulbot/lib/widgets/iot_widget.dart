@@ -127,6 +127,7 @@ class _IotWidgetState extends State<IotWidget> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    _bluetoothService.connection!.dispose();
     super.dispose();
   }
 

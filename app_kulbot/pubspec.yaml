@@ -9,7 +9,7 @@ environment:
   sdk: '>=2.19.3 <3.0.0'
 
 dependencies:
-  flutter:
+  flutter_localizations:
     sdk: flutter
 
   cupertino_icons: ^1.0.6
@@ -36,7 +36,7 @@ dependencies:
   exif: ^3.1.4
   flutter_barcode_scanner: ^2.0.0
   showcaseview: ^3.0.0
-  audioplayers: ^6.0.0
+  # audioplayers: ^6.0.0
   shared_preferences: ^2.2.3
   fluttertoast: ^8.2.6
   #webview_flutter_plus: ^0.4.7
@@ -70,7 +70,7 @@ flutter:
 
   assets:
     - lib/assets/images/
-    - lib/assets/music/
+    # - lib/assets/music/
     - assets/scratch/
     - assets/scratch/blocks/
     - assets/scratch/index.html

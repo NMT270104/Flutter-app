@@ -11,11 +11,7 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "TIMEOUT",
-            "value": 1,  // Giá trị mặc định
-            "min": 0,    // Giá trị tối thiểu
-            "max": 60,   // Giá trị tối đa (có thể chỉnh sửa theo nhu cầu)
-            "precision": 1,  // Độ chính xác, số thập phân
-            "check": "Number"
+            "check": "Number",
           }
         ],
         "previousStatement": null,
@@ -29,10 +25,6 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "TIMES",
-            "value": 10,  // Giá trị mặc định
-            "min": 1,    // Số lần lặp tối thiểu
-            "max": 100,  // Số lần lặp tối đa
-            "precision": 1,
             "check": "Number"
           }
         ],

@@ -53,6 +53,8 @@ class BluetoothService {
     _name = name;
   }
 
+  String? dataString;
+
   Future<void> requestLocationPermission() async {
     var status = await Permission.location.request();
     if (status.isGranted) {
@@ -144,7 +146,7 @@ Future<void> connectToDevice(BluetoothDevice device) async {
 
 
   void _onDataReceived(Uint8List data) {
-      String dataString = utf8.decode(data);
+       dataString = utf8.decode(data);
       print('Received data: $dataString');
     int backspacesCounter = 0;
     data.forEach((byte) {
