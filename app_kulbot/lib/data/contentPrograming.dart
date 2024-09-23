@@ -300,7 +300,21 @@ const Map<String, dynamic> initialToolboxJson = {
         
     },
 
-
+  {
+    'kind': 'category',
+    'name': 'Motions',
+    'colour': 220,
+    'contents':[
+      {
+        'kind': 'block',
+        'type':'motor1'
+      },
+      {
+        'kind': 'block',
+        'type':'Servo'
+      }
+    ]
+  },
 
 
 

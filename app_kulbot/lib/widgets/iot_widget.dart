@@ -64,11 +64,13 @@ class _IotWidgetState extends State<IotWidget> {
   late Stream<List<int>> stream;
   bool isConnecting = false;
   late List<String> _temphumidata;
-  double _currentValueTemp = 0.0;
-  double _currentValueHumidity = 0.0;
+  double _currentValueId1 = 0.0;
+  double _currentValueId2 = 0.0;
+  double _currentValueId3 = 0.0;
+  double _currentValueId4 = 0.0;
 
   StreamSubscription? _subscription;
-  
+
   @override
   void initState() {
     super.initState();
@@ -198,49 +200,15 @@ class _IotWidgetState extends State<IotWidget> {
   }
 
   Future<void> _delayedLoadSettings() async {
-  // Gọi _loadSettings() lần đầu
-  await _loadSettings();
+    // Gọi _loadSettings() lần đầu
+    await _loadSettings();
 
-  // Tạo độ trễ, ví dụ 2 giây
-  await Future.delayed(Duration(milliseconds: 500));
+    // Tạo độ trễ, ví dụ 2 giây
+    await Future.delayed(Duration(milliseconds: 500));
 
-  // Gọi _loadSettings() lần thứ hai
-  await _loadSettings();
-}
-
-
-  List<double> _dataParser(List<int> dataFromDevice) {
-  // Convert raw byte data to a string
-  String dataString = utf8.decode(dataFromDevice);
-  
-  // Remove whitespace to clean up the string
-  dataString = dataString.replaceAll(' ', '');
-
-  // Split the data using the semicolon as a delimiter
-  List<String> dataList = dataString.split(';');
-
-  // Prepare a list to store parsed values, initializing it for 2 values (temperature and humidity)
-  List<double> parsedValues = List.filled(2, 0.0);
-
-  for (var item in dataList) {
-    if (item.isNotEmpty) {
-      // Split each entry by the colon to separate 'id x:' from the value
-      var parts = item.split(':');
-      if (parts.length == 2) {
-        // Extract id and value
-        int id = int.parse(parts[0].replaceAll('id', '')) - 1; // Get 0-indexed ID
-        double value = double.parse(parts[1]);
-
-        if (id >= 0 && id < parsedValues.length) {
-          parsedValues[id] = value; // Assign the parsed value to the correct index
-        }
-      }
-    }
+    // Gọi _loadSettings() lần thứ hai
+    await _loadSettings();
   }
-
-  return parsedValues;
-}
-
 
   void _connectAndStartReceiving() async {
     setState(() {
@@ -252,25 +220,18 @@ class _IotWidgetState extends State<IotWidget> {
       await _bluetoothService.connectBluetoothDialog(context);
 
       if (_bluetoothService.connection!.isConnected) {
-  setState(() {
-    Fluttertoast.showToast(
-        msg: "Connected to device " + connectedDeviceName);
-    print("Connected to device " + connectedDeviceName);
-    isConnecting = false;
-  });
+        setState(() {
+          Fluttertoast.showToast(
+              msg: "Connected to device " + connectedDeviceName);
+          print("Connected to device " + connectedDeviceName);
+          isConnecting = false;
+        });
 
-  // Chờ một chút trước khi nhận dữ liệu
-  await Future.delayed(Duration(seconds: 1));
-
-  setState(() {
-    stream = _bluetoothService.receiveDataStream();
-    Fluttertoast.showToast(msg: "Temp: ${stream}");
-    print("Temp: ${stream}");
-  });
-} else {
-  throw Exception("Kết nối không thành công.");
-}
-
+        // Chờ một chút trước khi nhận dữ liệu
+        await Future.delayed(Duration(milliseconds: 500));
+      } else {
+        throw Exception("Kết nối không thành công.");
+      }
     } catch (e) {
       setState(() {
         isConnecting = false;
@@ -279,26 +240,66 @@ class _IotWidgetState extends State<IotWidget> {
     }
   }
 
-  void _listenForESPResponseSwitch() {
-    _subscription?.cancel();
-    _subscription = stream.listen((data) {
-      String response = utf8.decode(data);
+//   void _listenForESPResponseSwitch() {
+//   _subscription?.cancel();
+//   _subscription = _bluetoothService.stream.listen((data) {
+//     // Giả sử dữ liệu từ ESP được gửi dưới dạng string
+//     String response = utf8.decode(data);
+//     print("response from ESP: $response");  // In ra phản hồi từ ESP
 
-      // Assuming ESP sends back 'OK' when successful
-      if (response.contains(_ControllerLight1_On)) {
+//     // Kiểm tra xem phản hồi có chứa các lệnh đúng không
+//     if (response.contains(_ControllerLight1_On)) {
+//       setState(() {
+//         _containerColor_1 = Colors.green;  // Cập nhật màu cho Container 1
+//       });
+//     } else if (response.contains(_ControllerLight1_Off)) {
+//       setState(() {
+//         _containerColor_1 = Colors.red;
+//       });
+//     } else if (response.contains(_ControllerLight2_On)) {
+//       setState(() {
+//         _containerColor_2 = Colors.green;  // Cập nhật màu cho Container 2
+//       });
+//     } else if (response.contains(_ControllerLight2_Off)) {
+//       setState(() {
+//         _containerColor_2 = Colors.red;
+//       });
+//     }
+//   });
+// }
+
+ void _listenForESPResponseSwitch() {
+  _subscription?.cancel();
+  _subscription = _bluetoothService.stream.listen((data) {
+    String response = utf8.decode(data);
+    //print("response from ESP: $response");  // Kiểm tra chuỗi nhận được
+
+    // Tách chuỗi khi phát hiện ký tự kết thúc
+    List<String> responses = response.split("\n");
+    for (var res in responses) {
+      if (res.contains('Ledon')) {
         setState(() {
-          // Update the color of the container to green
           _containerColor_1 = Colors.green;
         });
-      } else if (response.contains(_ControllerLight1_Off)) {
-        _containerColor_2 = Colors.red;
-      } else if (response.contains(_ControllerLight2_On)) {
-        _containerColor_2 = Colors.green;
-      } else if (response.contains(_ControllerLight2_Off)) {
-        _containerColor_2 = Colors.red;
+      } else if (res.contains('Ledoff')) {
+        setState(() {
+          _containerColor_1 = Colors.red;
+        });
+      } else if (res.contains('on')) {
+        setState(() {
+          _containerColor_2 = Colors.green;
+        });
+      } else if (res.contains('off')) {
+        setState(() {
+          _containerColor_2 = Colors.red;
+        });
       }
-    });
-  }
+    }
+  });
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -373,20 +374,43 @@ class _IotWidgetState extends State<IotWidget> {
                     children: [
                       Container(
                         child: StreamBuilder<List<int>>(
-                          stream: stream,
-                          builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
-                            if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-                            if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-                              // Parse the incoming data
-                              var parsedValues = _dataParser(snapshot.data!);
-                              
-                              // Ensure you have exactly two values: temperature and humidity
-                              if (parsedValues.length == 2) {
-                                setState(() {
-                                  _currentValueTemp = parsedValues[0];    // Temperature value
-                                  _currentValueHumidity = parsedValues[1]; // Humidity value
-                                });
+                          stream: _bluetoothService
+                              .stream, // Lấy luồng dữ liệu từ BluetoothService
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<int>> snapshot) {
+                            if (snapshot.hasError) {
+                              return Text('Lỗi: ${snapshot.error}');
+                            }
+
+                            if (snapshot.connectionState ==
+                                    ConnectionState.active &&
+                                snapshot.hasData) {
+                              // Phân tích dữ liệu nhận được
+                              var parsedValues = snapshot.data ?? [];
+
+                              // Kiểm tra có đủ 2 giá trị
+                              if (parsedValues.isNotEmpty) {
+                                // Gán giá trị cho từng biến dựa trên số lượng giá trị nhận được
+                                if (parsedValues.length >= 1) {
+                                  _currentValueId1 = parsedValues[0].toDouble();
+                                }
+                                if (parsedValues.length >= 2) {
+                                  _currentValueId2 = parsedValues[1].toDouble();
+                                }
+                                if (parsedValues.length >= 3) {
+                                  _currentValueId3 = parsedValues[2].toDouble();
+                                }
+                                if (parsedValues.length >= 4) {
+                                  _currentValueId4 = parsedValues[3].toDouble();
+                                }
+                                // if (parsedValues[2] == 1) {
+                                //   _containerColor_1 = Colors.green;
+                                // }else{_containerColor_1 = Colors.red;}
+                                // if (parsedValues[3] == 2) {
+                                //   _containerColor_1 = Colors.green;
+                                // }else{_containerColor_1 = Colors.red;};
                               }
+
                               return Column(
                                 children: [
                                   Row(
@@ -395,7 +419,7 @@ class _IotWidgetState extends State<IotWidget> {
                                     children: [
                                       Expanded(
                                         child: SCS(
-                                          value: parsedValues[0],
+                                          value: _currentValueId1,
                                           unit: SCS_dv_1.isEmpty
                                               ? '˚C'
                                               : SCS_dv_1,
@@ -421,7 +445,7 @@ class _IotWidgetState extends State<IotWidget> {
                                       ),
                                       Expanded(
                                         child: SCS(
-                                          value: parsedValues[1],
+                                          value: _currentValueId2,
                                           unit:
                                               SCS_dv_2.isEmpty ? '%' : SCS_dv_2,
                                           trackColor: Colors.amber,
@@ -452,7 +476,7 @@ class _IotWidgetState extends State<IotWidget> {
                                     children: [
                                       Expanded(
                                         child: SCS(
-                                          value: 0, //parsedValues[2],
+                                          value: _currentValueId3,
                                           unit: SCS_dv_3.isEmpty
                                               ? '˚C'
                                               : SCS_dv_3,
@@ -473,13 +497,12 @@ class _IotWidgetState extends State<IotWidget> {
                                             _saveSettings();
                                             Navigator.pop(context);
                                             _delayedLoadSettings();
-
                                           },
                                         ),
                                       ),
                                       Expanded(
                                         child: SCS(
-                                          value: 0,// parsedValues[3],
+                                          value: _currentValueId4,
                                           unit:
                                               SCS_dv_4.isEmpty ? '%' : SCS_dv_4,
                                           trackColor: Colors.amber,
@@ -499,7 +522,6 @@ class _IotWidgetState extends State<IotWidget> {
                                             _saveSettings();
                                             Navigator.pop(context);
                                             _delayedLoadSettings();
-
                                           },
                                         ),
                                       ),
@@ -537,7 +559,6 @@ class _IotWidgetState extends State<IotWidget> {
                                             _saveSettings();
                                             Navigator.pop(context);
                                             _delayedLoadSettings();
-
                                           },
                                         ),
                                       ),
@@ -563,7 +584,6 @@ class _IotWidgetState extends State<IotWidget> {
                                             _saveSettings();
                                             Navigator.pop(context);
                                             _delayedLoadSettings();
-
                                           },
                                         ),
                                       ),
@@ -596,7 +616,6 @@ class _IotWidgetState extends State<IotWidget> {
                                             _saveSettings();
                                             Navigator.pop(context);
                                             _delayedLoadSettings();
-
                                           },
                                         ),
                                       ),
@@ -624,7 +643,6 @@ class _IotWidgetState extends State<IotWidget> {
                                             setState(() {
                                               _delayedLoadSettings();
                                             });
-
                                           },
                                         ),
                                       ),

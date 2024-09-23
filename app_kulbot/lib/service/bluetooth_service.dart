@@ -21,6 +21,7 @@ class _DeviceWithAvailability {
 }
 
 class BluetoothService {
+
   BluetoothState _bluetoothState = BluetoothState.STATE_ON;
   String _address = "...";
   String _name = "...";
@@ -31,7 +32,6 @@ class BluetoothService {
   FlutterBluetoothSerial.instance;
   BluetoothConnection? connection;
   List<_DeviceWithAvailability> devices = [];
-  String _buffer = ''; // Buffer to store incomplete data
   // Getter
   BluetoothState get bluetoothState => _bluetoothState;
   String get address => _address;
@@ -55,12 +55,19 @@ class BluetoothService {
 
   String? dataString;
 
+  final StreamController<List<int>> _streamController = StreamController.broadcast();
+
+  Stream<List<int>> get stream => _streamController.stream;
+
+
+
+                                                                                                            
   Future<void> requestLocationPermission() async {
     var status = await Permission.location.request();
     if (status.isGranted) {
       // Quyền truy cập vị trí được cấp
     } else if (status.isDenied) {
-      // Quyền truy cập vị trí bị từ chối
+      // Quyền truy cập vị trí bị từ chối 
     } else if (status.isPermanentlyDenied) {
       // Quyền truy cập vị trí bị từ chối vĩnh viễn, mở cài đặt ứng dụng
       openAppSettings();
@@ -107,22 +114,6 @@ class BluetoothService {
     });
   }
 
-  // Future<void> connectToDevice(BluetoothDevice device) async {
-  //   try {
-  //     connection = await BluetoothConnection.toAddress(device.address);
-  //     onDeviceConnected?.call(device.name ?? "Unknown");
-  //     // connectedDeviceName = device.name ?? "Unknown";
-  //     connection!.input?.listen(_onDataReceived).onDone(() {
-  //       if (isDisconnecting) {
-  //         print('Disconnecting locally!');
-  //       } else {
-  //         print('Disconnected remotely!');
-  //       }
-  //     });
-  //   } catch (e) {
-  //     print('Error connecting to device: $e');
-  //   }
-  // }
 
 Future<void> connectToDevice(BluetoothDevice device) async {
   try {
@@ -138,6 +129,8 @@ Future<void> connectToDevice(BluetoothDevice device) async {
       });
     } else {
       print('Connection failed or connection is null.');
+      onDeviceConnected?.call(device.name ?? "");
+
     }
   } catch (e) {
     print('Error connecting to device: $e');
@@ -146,60 +139,59 @@ Future<void> connectToDevice(BluetoothDevice device) async {
 
 
   void _onDataReceived(Uint8List data) {
-       dataString = utf8.decode(data);
-      print('Received data: $dataString');
-    int backspacesCounter = 0;
-    data.forEach((byte) {
-      if (byte == 8 || byte == 127) {
-        backspacesCounter++;
-      }
-    });
-    Uint8List buffer = Uint8List(data.length - backspacesCounter);
-    int bufferIndex = buffer.length;
+    String dataString = utf8.decode(data);
+    print("Full response: $dataString");
+    // Parse dữ liệu và thêm vào luồng
+    List<int> parsedValues = _parseData(dataString);
+    //print('_parseData : $parsedValues');
 
-    backspacesCounter = 0;
-    for (int i = data.length - 1; i >= 0; i--) {
-      if (data[i] == 8 || data[i] == 127) {
-        backspacesCounter++;
-      } else {
-        if (backspacesCounter > 0) {
-          backspacesCounter--;
+    _streamController.add(parsedValues);
+  }
+
+  // Hàm phân tích dữ liệu (chỉnh sửa theo định dạng "id 1: 50 ; id 2: 30 ;")
+List<int> _parseData(String dataString) {
+  List<int> values = [];
+
+
+  // Loại bỏ ký tự không mong muốn như '$' hoặc các ký tự đặc biệt khác
+  dataString = dataString.replaceAll(RegExp(r'[\$]'), ''); // Xóa tất cả ký tự $
+  // Tách chuỗi theo dấu chấm phẩy
+  List<String> parts = dataString.split(';');
+
+  for (var part in parts) {
+    part = part.trim();
+
+    if (part.contains(':')) {
+      List<String> subParts = part.split(':');
+      if (subParts.length == 2) {
+        double? value = double.tryParse(subParts[1].trim());
+        if (value != null) {
+          values.add(value.toInt());
         } else {
-          buffer[--bufferIndex] = data[i];
+          print("Invalid value format: ${subParts[1]}");
         }
+      } else {
+        print("Invalid format in part: $part");
       }
     }
   }
 
+  if (values.isEmpty) {
+    print('No valid values found in dataString: $dataString');
+  }
 
-//   void _onDataReceived(Uint8List data) {
-//   // Append incoming data to buffer
-//   _buffer += utf8.decode(data);
-  
-//   // Check if a complete message has been received (ends with a semicolon)
-//   if (_buffer.contains(';')) {
-//     // Split by semicolons and process each complete message
-//     List<String> messages = _buffer.split(';');
-    
-//     for (int i = 0; i < messages.length - 1; i++) {
-//       // Process each message
-//       List<int> messageBytes = utf8.encode(messages[i] + ';');
-//       var parsedValues = _dataParser(messageBytes);
-//       print("Parsed values: $parsedValues");
-//     }
-    
-//     // Keep the last incomplete message in the buffer
-//     _buffer = messages.last;
-//   }
-// }
+  return values;
+}
 
 
-  // Phương thức này sẽ trả về một Stream<List<int>> để bạn có thể lắng nghe dữ liệu nhận được từ thiết bị Bluetooth
-//  Stream<List<int>> receiveDataStream() {
-//   // Kiểm tra xem đã kết nối Bluetooth chưa
+
+
+
+
+// Stream<List<int>> receiveDataStream() {
 //   if (connection != null && connection!.isConnected) {
 //     if (connection!.input != null) {
-//       return connection!.input!.asBroadcastStream(); // Chuyển đổi thành broadcast stream
+//       return connection!.input!.asBroadcastStream();
 //     } else {
 //       throw Exception("Không có dữ liệu đầu vào từ thiết bị Bluetooth");
 //     }
@@ -208,7 +200,9 @@ Future<void> connectToDevice(BluetoothDevice device) async {
 //   }
 // }
 
-Stream<List<int>> receiveDataStream() {
+
+
+ Stream<List<int>> receiveDataStream() {
   if (connection != null && connection!.isConnected) {
     if (connection!.input != null) {
       return connection!.input!.asBroadcastStream();
@@ -220,27 +214,6 @@ Stream<List<int>> receiveDataStream() {
   }
 }
 
-
-
-  void _processReceivedData(String data) {
-    // Logic tùy chỉnh để xử lý dữ liệu nhận được từ ESP32
-    // Ví dụ: bạn có thể phân tích JSON, xử lý các lệnh, v.v.
-    if (data.contains("COMMAND_1")) {
-      // Thực hiện một hành động khi nhận lệnh COMMAND_1
-      print('Đã nhận COMMAND_1!');
-    } else if (data.contains("COMMAND_2")) {
-      // Thực hiện một hành động khi nhận lệnh COMMAND_2
-      print('Đã nhận COMMAND_2!');
-    }
-    
-    // Giả sử dữ liệu nhận được là giá trị số, ví dụ: "50.0"
-    double newValue = double.tryParse(data) ?? 0.0;
-
-    // Gọi callback để cập nhật giá trị trong UI
-    if (onValueReceiveChanged != null) {
-      onValueReceiveChanged!(newValue);
-    }
-  }
 
 
 
