@@ -4,11 +4,13 @@ import 'dart:convert';
 import 'package:Kulbot/utils/AnimatedToggleSwitch.dart';
 import 'package:Kulbot/utils/SleekCircularSlider.dart';
 import 'package:Kulbot/widgets/settingIoT_widget.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../service/bluetooth_service.dart';
 
 class IotWidget extends StatefulWidget {
@@ -26,11 +28,11 @@ class _IotWidgetState extends State<IotWidget> {
   String _ControllerSwitch2_On = "";
   String _ControllerSwitch2_Off = "";
 
-  String _ControllerLight1_On = "";
-  String _ControllerLight1_Off = "";
+  // String _ControllerLight1_On = "";
+  // String _ControllerLight1_Off = "";
 
-  String _ControllerLight2_On = "";
-  String _ControllerLight2_Off = "";
+  // String _ControllerLight2_On = "";
+  // String _ControllerLight2_Off = "";
 
   final TextEditingController _editingSCS_title_1 = TextEditingController();
   final TextEditingController _editingSCS_dv_1 = TextEditingController();
@@ -63,7 +65,11 @@ class _IotWidgetState extends State<IotWidget> {
 
   late Stream<List<int>> stream;
   bool isConnecting = false;
-  late List<String> _temphumidata;
+
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String voicetotext = "";
+
   double _currentValueId1 = 0.0;
   double _currentValueId2 = 0.0;
   double _currentValueId3 = 0.0;
@@ -121,6 +127,8 @@ class _IotWidgetState extends State<IotWidget> {
     });
 
     _bluetoothService.getBondedDevices();
+
+    _speech = stt.SpeechToText();
   }
 
   @override
@@ -161,15 +169,15 @@ class _IotWidgetState extends State<IotWidget> {
       _ControllerSwitch2_Off =
           prefs.getString('_editingControllerSwitch2_Off') ?? '';
 
-      _ControllerLight1_On =
-          prefs.getString('_editingControllerLight1_On') ?? '';
-      _ControllerLight1_Off =
-          prefs.getString('_editingControllerLight1_Off') ?? '';
+      // _ControllerLight1_On =
+      //     prefs.getString('_editingControllerLight1_On') ?? '';
+      // _ControllerLight1_Off =
+      //     prefs.getString('_editingControllerLight1_Off') ?? '';
 
-      _ControllerLight2_On =
-          prefs.getString('_editingControllerLight2_On') ?? '';
-      _ControllerLight2_Off =
-          prefs.getString('_editingControllerLight2_Off') ?? '';
+      // _ControllerLight2_On =
+      //     prefs.getString('_editingControllerLight2_On') ?? '';
+      // _ControllerLight2_Off =
+      //     prefs.getString('_editingControllerLight2_Off') ?? '';
 
       SCS_title_1 = prefs.getString('_editingSCS_title_1') ?? 'Temp 1';
       //_editingSCS_title_1.text = prefs.getString('_editingSCS_title_1')?? 'Temp 1';
@@ -213,6 +221,7 @@ class _IotWidgetState extends State<IotWidget> {
   void _connectAndStartReceiving() async {
     setState(() {
       isConnecting = true;
+      _bluetoothService.startDiscoveryWithTimeout();
     });
 
     try {
@@ -228,7 +237,7 @@ class _IotWidgetState extends State<IotWidget> {
         });
 
         // Chờ một chút trước khi nhận dữ liệu
-        await Future.delayed(Duration(milliseconds: 500));
+        await Future.delayed(Duration(milliseconds: 1000));
       } else {
         throw Exception("Kết nối không thành công.");
       }
@@ -268,38 +277,83 @@ class _IotWidgetState extends State<IotWidget> {
 //   });
 // }
 
- void _listenForESPResponseSwitch() {
-  _subscription?.cancel();
-  _subscription = _bluetoothService.stream.listen((data) {
-    String response = utf8.decode(data);
-    //print("response from ESP: $response");  // Kiểm tra chuỗi nhận được
+  void _listenForESPResponseSwitch() {
+    _subscription?.cancel();
+    _subscription = _bluetoothService.stream.listen((data) {
+      String response = utf8.decode(data);
+      //print("response from ESP: $response");  // Kiểm tra chuỗi nhận được
 
-    // Tách chuỗi khi phát hiện ký tự kết thúc
-    List<String> responses = response.split("\n");
-    for (var res in responses) {
-      if (res.contains('Ledon')) {
-        setState(() {
-          _containerColor_1 = Colors.green;
-        });
-      } else if (res.contains('Ledoff')) {
-        setState(() {
-          _containerColor_1 = Colors.red;
-        });
-      } else if (res.contains('on')) {
-        setState(() {
-          _containerColor_2 = Colors.green;
-        });
-      } else if (res.contains('off')) {
-        setState(() {
-          _containerColor_2 = Colors.red;
-        });
+      // Tách chuỗi khi phát hiện ký tự kết thúc
+      List<String> responses = response.split("\n");
+      for (var res in responses) {
+        if (res.contains('Ledon')) {
+          setState(() {
+            _containerColor_1 = Colors.green;
+          });
+        } else if (res.contains('Ledoff')) {
+          setState(() {
+            _containerColor_1 = Colors.red;
+          });
+        } else if (res.contains('on')) {
+          setState(() {
+            _containerColor_2 = Colors.green;
+          });
+        } else if (res.contains('off')) {
+          setState(() {
+            _containerColor_2 = Colors.red;
+          });
+        }
       }
+    });
+  }
+
+  void _listenVoiceToText() async {
+
+  try {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => print('onError: $val'),
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            voicetotext = val.recognizedWords;
+            Fluttertoast.showToast(msg: voicetotext);
+          }),
+        );
+      } else {
+        print('Speech recognition not available');
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
     }
-  });
+  } catch (e) {
+    print('Error initializing speech recognition: $e');
+  }
 }
 
 
-
+  void voiceActive() {
+    if (voicetotext.contains('Tiến') ||
+        voicetotext.contains('lên') ||
+        voicetotext.contains('forward')) {
+      _bluetoothService.sendMessage('f');
+    } else if (voicetotext.contains('lui') ||
+        voicetotext.contains('lùi') ||
+        voicetotext.contains('back')) {
+      _bluetoothService.sendMessage('b');
+    } else if (voicetotext.contains('trái') || voicetotext.contains('left')) {
+      _bluetoothService.sendMessage('l');
+    } else if (voicetotext.contains('phải') || voicetotext.contains('right')) {
+      _bluetoothService.sendMessage('r');
+    } else if (voicetotext.contains('dừng lại') ||
+        voicetotext.contains('stop')) {
+      _bluetoothService.sendMessage('s');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -365,6 +419,18 @@ class _IotWidgetState extends State<IotWidget> {
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AvatarGlow(
+        animate: _isListening,
+        glowColor: Colors.green,
+        duration: const Duration(milliseconds: 2000),
+        repeat: true,
+        child: FloatingActionButton(
+          backgroundColor: Colors.green,
+          onPressed: _listenVoiceToText, 
+          child: Icon(_isListening ? Icons.mic : Icons.mic_none),
+        ),
+      ),
       body: isConnecting
           ? Center(child: CircularProgressIndicator())
           : stream == null
@@ -403,12 +469,11 @@ class _IotWidgetState extends State<IotWidget> {
                                 if (parsedValues.length >= 4) {
                                   _currentValueId4 = parsedValues[3].toDouble();
                                 }
-                                // if (parsedValues[2] == 1) {
+                                // if (parsedValues[4] == 1) {
                                 //   _containerColor_1 = Colors.green;
-                                // }else{_containerColor_1 = Colors.red;}
-                                // if (parsedValues[3] == 2) {
-                                //   _containerColor_1 = Colors.green;
-                                // }else{_containerColor_1 = Colors.red;};
+                                // }else if (parsedValues[4] == 0)
+                                //   {_containerColor_1 = Colors.red;}
+                                
                               }
 
                               return Column(
@@ -679,7 +744,8 @@ class _IotWidgetState extends State<IotWidget> {
                                         border: Border.all(),
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(100)),
-                                        color: _containerColor_1,
+                                        color: _bluetoothService.connection != null &&
+                                _bluetoothService.connection!.isConnected && switch1 ? Colors.green : Colors.red ,
                                       ),
                                     ),
                                   ),
@@ -695,15 +761,15 @@ class _IotWidgetState extends State<IotWidget> {
                                         if (switch1) {
                                           _bluetoothService.sendMessage(
                                               _ControllerSwitch1_On);
-                                          Fluttertoast.showToast(
-                                              msg: _ControllerSwitch1_On);
+                                          // Fluttertoast.showToast(
+                                          //     msg: _ControllerSwitch1_On);
                                           print(_ControllerSwitch1_On);
                                           _listenForESPResponseSwitch();
                                         } else {
                                           _bluetoothService.sendMessage(
                                               _ControllerSwitch1_Off);
-                                          Fluttertoast.showToast(
-                                              msg: _ControllerSwitch1_Off);
+                                          // Fluttertoast.showToast(
+                                          //     msg: _ControllerSwitch1_Off);
                                           print(_ControllerSwitch1_Off);
                                           _listenForESPResponseSwitch();
                                         }
@@ -738,7 +804,8 @@ class _IotWidgetState extends State<IotWidget> {
                                         border: Border.all(),
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(100)),
-                                        color: _containerColor_2,
+                                        color: _bluetoothService.connection != null &&
+                                _bluetoothService.connection!.isConnected && switch2 ? Colors.green : Colors.red ,
                                       ),
                                     ),
                                   ),
@@ -754,15 +821,15 @@ class _IotWidgetState extends State<IotWidget> {
                                         if (switch2) {
                                           _bluetoothService.sendMessage(
                                               _ControllerSwitch2_On);
-                                          Fluttertoast.showToast(
-                                              msg: _ControllerSwitch2_On);
+                                          // Fluttertoast.showToast(
+                                          //     msg: _ControllerSwitch2_On);
                                           print(_ControllerSwitch1_On);
                                           _listenForESPResponseSwitch();
                                         } else {
                                           _bluetoothService.sendMessage(
                                               _ControllerSwitch2_Off);
-                                          Fluttertoast.showToast(
-                                              msg: _ControllerSwitch2_Off);
+                                          // Fluttertoast.showToast(
+                                          //     msg: _ControllerSwitch2_Off);
                                           print(_ControllerSwitch2_Off);
                                           _listenForESPResponseSwitch();
                                         }
@@ -779,7 +846,7 @@ class _IotWidgetState extends State<IotWidget> {
                       ),
                       SizedBox(
                         height: 10,
-                      )
+                      ),
                     ],
                   ),
                 ),

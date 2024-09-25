@@ -45,7 +45,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
   {
@@ -198,7 +198,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
   {
@@ -244,7 +244,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
   {
@@ -290,7 +290,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
   {
@@ -336,7 +336,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
   {
@@ -477,7 +477,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
   {
@@ -545,7 +545,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
   {
@@ -591,7 +591,7 @@ Blockly.defineBlocksWithJsonArray([
         ]
       }
     ],
-    'output': 'Float',
+    'output': 'Number',
     "colour": 230,
   },
 

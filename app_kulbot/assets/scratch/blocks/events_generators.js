@@ -1,166 +1,61 @@
 'use strict';
 
+const startKulbot = 'event_program_starts';
+const start_state_name = "DO";
 
 Blockly.defineBlocksWithJsonArray([
-    {
-        "type": "event_program_starts",
-        "message0": "when Kulbot begin",
-        //"message1": "%1",
-        "args1": [
-          {"type": "input_statement", "name": "DO", "flip_rtl": true}
-        ],
-        "colour": 120,
-        "nextStatement": true,
-      }
-      ,
+  {
+    "type": startKulbot,
+    "message0": "when Kulbot begin",
+    "args1": [
       {
-        "type": "event_repeat_forever",
-        "message0": "repeat forever",
-        "message1": "%1",
-        "args1": [
-          {"type": "input_statement", "name": "DO"}
-        ],
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 120,
-        "tooltip": "",
-        "helpUrl": ""
+        "type": "input_statement",
+        "name": start_state_name, // Đảm bảo sử dụng tên đúng
       }
-    ,
-      {
-        "type": "event_repeat_timer",
-        "message0": "repeat every %1 milliseconds",
-        "inputsInline": true,
-        "args0": [
-          {
-            "type": "input_value",
-            "name": "PERIOD",
-            "check": "Number"
-          }
-        ],
-        "message1": "%1",
-        "args1": [
-          {"type": "input_statement", "name": "DO"}
-        ],
-        "colour": 65
-      }
-       ,
-      
-      {
-        "type": "logic_boolean_workaround",
-        "message0": "\u00A0%1",
-        "args0": [
-          {
-            "type": "field_dropdown",
-            "name": "BOOL",
-            "options": [
-              ["true", "TRUE"],
-              ["false", "FALSE"]
-            ]
-          }
-        ],
-        "output": "Boolean",
-        "colour": "210"
-      }
-  ]);
+    ],
+    "colour": 120,
+    "nextStatement": true
+  }
+]);
 
-  jsonGenerator.forBlock['event_program_starts'] = function(block, generator) {
-    const name = "b";
-    const value = "a";
-    const code = `"${name}": ${value}`;
+
+javascript.javascriptGenerator.forBlock[startKulbot] = function(block) {
+  try {
+    console.log(block); // Kiểm tra nội dung block
+    const doInput = block.getInput(start_state_name); // Lấy input DO
+    console.log(doInput); // Kiểm tra thông tin input DO
+
+    if (!doInput) {
+      throw new Error(`Input "${start_state_name}" không tồn tại trong block.`);
+    }
+
+    var importLib = "#include <Arduino.h> \n#include <KULBOT.h>";
+    var globalVariable = "KULBOT Rob;";
+    var setUp = "void setup() { \n Rob.KULBOT_INIT(); \n}";
+
+    // Lấy mã từ input DO
+    var statement_do = javascript.javascriptGenerator.statementToCode(block, start_state_name) || ''; 
+
+    var loop = `void loop() { \n ${statement_do} \n}`;
+
+    var code = importLib + "\n" + globalVariable + "\n" + setUp + "\n" + loop + "\n";
     return code;
-  };
 
-  // Blockly.JavaScript['event_program_starts'] = function(block) {
-  //   var nextCode = Blockly.JavaScript.statementToCode(block, 'DO');
-  //   var code = 'while(true) {\n' +
-  //               nextCode + '\n' +
-  //               'if(Turtle.isStop() == true){break;}\n' +
-  //             '}; Turtle.MF(0);\n';
-  //   return code;
-  // };
-
-  // Khối event_program_starts
-// Blockly.Dart['event_program_starts'] = function(block) {
-//   var statements_do = Blockly.Dart.statementToCode(block, 'DO');
-//   var code = 'void startProgram() {\n' + statements_do + '\n}\n';
-//   return code;
-// };
-
-// Khối event_repeat_forever
-Blockly.Dart['event_repeat_forever'] = function(block) {
-  var statements_do = Blockly.Dart.statementToCode(block, 'DO');
-  var code = 'while (true) {\n' + statements_do + '\n}\n';
-  return code;
+  } catch (e) {
+    console.error("Error generating code:", e);
+    return 'Error generating code';
+  }
 };
 
-// Khối event_repeat_timer
-Blockly.Dart['event_repeat_timer'] = function(block) {
-  var period = Blockly.Dart.valueToCode(block, 'PERIOD', Blockly.Dart.ORDER_ATOMIC) || '500';
-  var statements_do = Blockly.Dart.statementToCode(block, 'DO');
-  var code = 'Timer.periodic(Duration(milliseconds: ' + period + '), (timer) {\n' + statements_do + '\n});\n';
-  return code;
-};
+const workspace = Blockly.inject('blocklyDiv', { toolbox: document.getElementById('toolbox') });
+const block = workspace.newBlock('event_program_starts');
+block.initSvg();
+block.render(); // Vẽ khối
 
-// Khối event_wait
-Blockly.Dart['event_wait'] = function(block) {
-  var timeout = Blockly.Dart.valueToCode(block, 'TIMEOUT', Blockly.Dart.ORDER_ATOMIC) || '500';
-  var code = 'await Future.delayed(Duration(milliseconds: ' + timeout + '));\n';
-  return code;
-};
+console.log("Block:", block);
+console.log("Block Inputs:", block.inputList); // In ra danh sách các input của block
 
-// Khối logic_boolean_workaround
-Blockly.Dart['logic_boolean_workaround'] = function(block) {
-  var code = (block.getFieldValue('BOOL') == 'TRUE') ? 'true' : 'false';
-  return [code, Blockly.Dart.ORDER_ATOMIC];
-};
-
-
-
-// Blockly.JavaScript['event_repeat_forever'] = function(block) {
-//     var nextCode = Blockly.JavaScript.statementToCode(block, 'DO');
-//     return 'while(true) {\n' +
-//                 nextCode+'\n' +
-//                 "if(Turtle.isStop() == true){break;}\n"+
-//             '}; Turtle.MF(0);\n';
-// };
-
-// Blockly.JavaScript['event_repeat_timer'] = function(block) {
-//     var period = Blockly.JavaScript.valueToCode(block, 'PERIOD', Blockly.JavaScript.ORDER_FUNCTION_CALL) || 500
-
-//     var nextCode = Blockly.JavaScript.statementToCode(block, 'DO');
-//     return "setInterval(() => {\n"+nextCode+"\n}, "+period+");"
-// };
-
-// Blockly.JavaScript['event_wait'] = function(block) {
-//     // Terrible implementation of wait for the moment
-//     var timeout = Blockly.JavaScript.valueToCode(block, 'TIMEOUT', Blockly.JavaScript.ORDER_FUNCTION_CALL) || 500
-// //    var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
-// //    var nextCode = Blockly.JavaScript.blockToCode(nextBlock);
-// //    // And then remove the next block from code generation
-// //    block.nextConnection = null;
-// //    var functionName = Blockly.JavaScript.provideFunction_(
-// //          'timer',
-// //          ['function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
-// //              '(ms) {',
-// //           '  return new Promise(res => setTimeout(res, ms));',
-// //           '}']);
-// //    var functionName = Blockly.JavaScript.provideFunction_(
-// //             'sleep',
-// //             ['async function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
-// //                 '(ms) {',
-// //              '  await timer(ms);',
-// //              '}']);
-// //    return "sleep("+timeout+");\n"+nextCode
-//     return  "let d = Date.now();\n"+
-//             "do {}\n"+
-//             "while(Date.now()-d < "+timeout+");\n"
-// };
-
-// Blockly.JavaScript['logic_boolean_workaround'] = function(block) {
-//     var code = (block.getFieldValue('BOOL') == 'TRUE') ? 'true' : 'false';
-//     return [code, Blockly.JavaScript.ORDER_ATOMIC];
-// };
-
-
+// Chuyển block thành mã
+const code = Blockly.JavaScript.blockToCode(block);
+console.log(code);
 

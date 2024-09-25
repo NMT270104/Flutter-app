@@ -47,19 +47,18 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "COLUMN",
-            "check": "Number",
+
             
           },
           {
             "type": "input_value",
             "name": "CELL",
-            "check": "Number",
             
           },
           {
             "type": "input_value",
             "name": "NUMBER",
-            "check": "Number",
+
             
           }
         ],
@@ -113,19 +112,19 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "COLUMN",
-            "check": "Number",
+
             
           },
           {
             "type": "input_value",
             "name": "CELL",
-            "check": "Number",
+
             
           },
           {
             "type": "input_value",
             "name": "STRING",
-            "check": "String",
+
             
           }
         ],

@@ -56,21 +56,20 @@ const Map<String, dynamic> initialToolboxJson = {
       "contents": [
         {
           'kind': 'block',
-          'blockxml': '<block type="event_program_starts"></block>',
           'type': "event_program_starts"
         },
-        {
-          'kind': 'block',
-          'type': 'event_repeat_forever'
-        },
-        {
-          'kind': 'block',
-          'type': "event_repeat_timer"
-        },
-        {
-          'kind': 'block',
-          'type': "logic_boolean_workaround"
-        }
+        // {
+        //   'kind': 'block',
+        //   'type': 'event_repeat_forever'
+        // },
+        // {
+        //   'kind': 'block',
+        //   'type': "event_repeat_timer"
+        // },
+        // {
+        //   'kind': 'block',
+        //   'type': "logic_boolean_workaround"
+        // }
       ]
     },
   //Control

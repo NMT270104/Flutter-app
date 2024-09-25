@@ -1,10 +1,12 @@
 'use strict';
 
+const loop = 'controls_forever';
+const block_wait_seconds = "wait_seconds";
 
 Blockly.defineBlocksWithJsonArray([
 
     {
-        "type": "wait_seconds",
+        "type": block_wait_seconds,
         "message0": "wait %1 seconds",
         "inputsInline": true,
         "args0": [
@@ -25,7 +27,6 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "TIMES",
-            "check": "Number"
           }
         ],
         "message1": "%1",
@@ -41,14 +42,14 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "Lặp lại một hành động nhiều lần.",
       },
       {
-        "type": "controls_forever",
+        "type": loop,
         "message0": "forever",
         
         "message1": "%1",
         "args1": [
           {
             "type": "input_statement",
-            "name": "DO"
+            "name": "LOOP"
           }
         ],
         'args2': [],
@@ -100,3 +101,30 @@ Blockly.defineBlocksWithJsonArray([
       
 
 ]);
+
+
+// javascript.javascriptGenerator.forBlock[loop] = function(block, generator) {
+//   try {
+//     const loop = `void loop() { \n k \n}`;
+    
+//     const code = loop;
+//     return code;
+    
+//   } catch (e) {
+//     console.error("Error generating code:", e);
+//     return 'Error generating code';
+//   }
+// };
+// javascript.javascriptGenerator.forBlock[block_wait_seconds] = function (block) {
+//   try{
+//   var timeoutBlock = block.getInputTargetBlock('TIMEOUT');
+//   // Nếu tồn tại khối con và là kiểu 'math_number', lấy giá trị của nó
+//   var code1 = (timeoutBlock && timeoutBlock.type === 'math_number') ? timeoutBlock.getFieldValue('NUM') : '1';
+//   var code = 'delay(' + code1 + ' * 1000);';
+ 
+//   return code; 
+// }catch(e){
+//   console.error('Error generating code:', e);
+//   return 'Error generating code';
+// }
+// };

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blockly_plus/flutter_blockly_plus.dart';
@@ -214,15 +216,15 @@ class _ProgramingscreenState extends State<Programingscreen> {
             ),
         AnimatedContainer(
             duration: Duration(milliseconds: 300),
-            width: _isExpanded ? 150 : 0,
-            height: _isExpanded ? 330 : 0,
+            width: _isExpanded ? 180 : 0,
+            height: _isExpanded ? 335 : 0,
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(8.0),
               color: Colors.white,
             ),
-            child: SingleChildScrollView(
+             child: SingleChildScrollView(
               child: Text(
                 _generatedCode,
                 style: const TextStyle(fontSize: 14, fontFamily: 'Monospace'),
@@ -236,13 +238,22 @@ class _ProgramingscreenState extends State<Programingscreen> {
         title: const Text('Programing'),
         toolbarHeight: 40,
         actions: [
-
+          Padding(padding: EdgeInsets.only(right: 10),
+          child: IconButton(
+            icon: Icon(Icons.copy),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: _generatedCode));
+            Fluttertoast.showToast(msg: 'Đã sao chép vào clipboard!');
+            },
+          ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 10),
             child: IconButton(
               onPressed: () {
                 Fluttertoast.showToast(msg: _generatedCode);
-                _bluetoothService.sendMessage(_generatedCode);
+                String jsonData = jsonEncode(_generatedCode);
+                _bluetoothService.sendMessage(jsonData);
               },
               icon: Icon(Icons.play_arrow),
             ),

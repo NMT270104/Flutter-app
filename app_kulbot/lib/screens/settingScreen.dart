@@ -318,11 +318,12 @@ class _settingScreenState extends State<settingScreen> {
                     Fluttertoast.showToast(msg: "Đã Lưu!", fontSize: 20);
                   },
                   child: Text(
-                    "Luu",
+                    "Lưu",
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
               ),
+              SizedBox(height: 10,)
             ],
           ),
         ),

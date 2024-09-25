@@ -17,11 +17,11 @@ class _SettingiotWidgetState extends State<SettingiotWidget> {
   final TextEditingController _editingControllerSwitch2_On = TextEditingController();
   final TextEditingController _editingControllerSwitch2_Off = TextEditingController();
 
-  final TextEditingController _editingControllerLight1_On = TextEditingController();
-  final TextEditingController _editingControllerLight1_Off = TextEditingController();
+  // final TextEditingController _editingControllerLight1_On = TextEditingController();
+  // final TextEditingController _editingControllerLight1_Off = TextEditingController();
 
-  final TextEditingController _editingControllerLight2_On = TextEditingController();
-  final TextEditingController _editingControllerLight2_Off = TextEditingController();
+  // final TextEditingController _editingControllerLight2_On = TextEditingController();
+  // final TextEditingController _editingControllerLight2_Off = TextEditingController();
 
   @override
   void initState() {
@@ -41,15 +41,15 @@ class _SettingiotWidgetState extends State<SettingiotWidget> {
     await prefs.setString(
         '_editingControllerSwitch2_Off', _editingControllerSwitch2_Off.text);
 
-    await prefs.setString(
-        '_editingControllerLight1_On', _editingControllerLight1_On.text);
-    await prefs.setString(
-        '_editingControllerLight1_Off', _editingControllerLight1_Off.text);
+    // await prefs.setString(
+    //     '_editingControllerLight1_On', _editingControllerLight1_On.text);
+    // await prefs.setString(
+    //     '_editingControllerLight1_Off', _editingControllerLight1_Off.text);
 
-    await prefs.setString(
-        '_editingControllerLight2_On', _editingControllerLight2_On.text);
-    await prefs.setString(
-        '_editingControllerLight2_Off', _editingControllerLight2_Off.text);
+    // await prefs.setString(
+    //     '_editingControllerLight2_On', _editingControllerLight2_On.text);
+    // await prefs.setString(
+    //     '_editingControllerLight2_Off', _editingControllerLight2_Off.text);
 
 
      print("Saved settings: ${_editingControllerSwitch1_On.text}, ${_editingControllerSwitch1_Off.text}");
@@ -69,15 +69,15 @@ class _SettingiotWidgetState extends State<SettingiotWidget> {
       _editingControllerSwitch2_Off.text =
           prefs.getString('_editingControllerSwitch2_Off') ?? '';
 
-      _editingControllerLight1_On.text =
-          prefs.getString('_editingControllerLight1_On') ?? '';
-      _editingControllerLight1_Off.text =
-          prefs.getString('_editingControllerLight1_Off') ?? '';
+      // _editingControllerLight1_On.text =
+      //     prefs.getString('_editingControllerLight1_On') ?? '';
+      // _editingControllerLight1_Off.text =
+      //     prefs.getString('_editingControllerLight1_Off') ?? '';
 
-      _editingControllerLight2_On.text =
-          prefs.getString('_editingControllerLight2_On') ?? '';
-      _editingControllerLight2_Off.text =
-          prefs.getString('_editingControllerLight2_Off') ?? '';
+      // _editingControllerLight2_On.text =
+      //     prefs.getString('_editingControllerLight2_On') ?? '';
+      // _editingControllerLight2_Off.text =
+      //     prefs.getString('_editingControllerLight2_Off') ?? '';
     });
   }
 
@@ -152,54 +152,54 @@ class _SettingiotWidgetState extends State<SettingiotWidget> {
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded( // Use Expanded to prevent overflow in Row
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: InputSettingIoT(
-                        label: "Light 1: ON",
-                        controller: _editingControllerLight1_On,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16), // Add spacing between the two columns
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: InputSettingIoT(
-                        label: "Light 1: Off",
-                        controller: _editingControllerLight1_Off,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded( // Use Expanded to prevent overflow in Row
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: InputSettingIoT(
-                        label: "Light 2: ON",
-                        controller: _editingControllerLight2_On,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16), // Add spacing between the two columns
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: InputSettingIoT(
-                        label: "Light 2: Off",
-                        controller: _editingControllerLight2_Off,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     Expanded( // Use Expanded to prevent overflow in Row
+              //       child: Padding(
+              //         padding: EdgeInsets.only(top: 20),
+              //         child: InputSettingIoT(
+              //           label: "Light 1: ON",
+              //           controller: _editingControllerLight1_On,
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(width: 16), // Add spacing between the two columns
+              //     Expanded(
+              //       child: Padding(
+              //         padding: EdgeInsets.only(top: 20),
+              //         child: InputSettingIoT(
+              //           label: "Light 1: Off",
+              //           controller: _editingControllerLight1_Off,
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     Expanded( // Use Expanded to prevent overflow in Row
+              //       child: Padding(
+              //         padding: EdgeInsets.only(top: 20),
+              //         child: InputSettingIoT(
+              //           label: "Light 2: ON",
+              //           controller: _editingControllerLight2_On,
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(width: 16), // Add spacing between the two columns
+              //     Expanded(
+              //       child: Padding(
+              //         padding: EdgeInsets.only(top: 20),
+              //         child: InputSettingIoT(
+              //           label: "Light 2: Off",
+              //           controller: _editingControllerLight2_Off,
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
