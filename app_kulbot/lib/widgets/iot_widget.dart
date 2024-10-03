@@ -277,35 +277,35 @@ class _IotWidgetState extends State<IotWidget> {
 //   });
 // }
 
-  void _listenForESPResponseSwitch() {
-    _subscription?.cancel();
-    _subscription = _bluetoothService.stream.listen((data) {
-      String response = utf8.decode(data);
-      //print("response from ESP: $response");  // Kiểm tra chuỗi nhận được
+  // void _listenForESPResponseSwitch() {
+  //   _subscription?.cancel();
+  //   _subscription = _bluetoothService.stream.listen((data) {
+  //     String response = utf8.decode(data);
+  //     //print("response from ESP: $response");  // Kiểm tra chuỗi nhận được
 
-      // Tách chuỗi khi phát hiện ký tự kết thúc
-      List<String> responses = response.split("\n");
-      for (var res in responses) {
-        if (res.contains('Ledon')) {
-          setState(() {
-            _containerColor_1 = Colors.green;
-          });
-        } else if (res.contains('Ledoff')) {
-          setState(() {
-            _containerColor_1 = Colors.red;
-          });
-        } else if (res.contains('on')) {
-          setState(() {
-            _containerColor_2 = Colors.green;
-          });
-        } else if (res.contains('off')) {
-          setState(() {
-            _containerColor_2 = Colors.red;
-          });
-        }
-      }
-    });
-  }
+  //     // Tách chuỗi khi phát hiện ký tự kết thúc
+  //     List<String> responses = response.split("\n");
+  //     for (var res in responses) {
+  //       if (res.contains('Ledon')) {
+  //         setState(() {
+  //           _containerColor_1 = Colors.green;
+  //         });
+  //       } else if (res.contains('Ledoff')) {
+  //         setState(() {
+  //           _containerColor_1 = Colors.red;
+  //         });
+  //       } else if (res.contains('on')) {
+  //         setState(() {
+  //           _containerColor_2 = Colors.green;
+  //         });
+  //       } else if (res.contains('off')) {
+  //         setState(() {
+  //           _containerColor_2 = Colors.red;
+  //         });
+  //       }
+  //     }
+  //   });
+  // }
 
   void _listenVoiceToText() async {
 
@@ -439,11 +439,11 @@ class _IotWidgetState extends State<IotWidget> {
                   child: Column(
                     children: [
                       Container(
-                        child: StreamBuilder<List<int>>(
+                        child: StreamBuilder<Map<String, double?>>(
                           stream: _bluetoothService
                               .stream, // Lấy luồng dữ liệu từ BluetoothService
                           builder: (BuildContext context,
-                              AsyncSnapshot<List<int>> snapshot) {
+                              AsyncSnapshot<Map<String, double?>> snapshot) {
                             if (snapshot.hasError) {
                               return Text('Lỗi: ${snapshot.error}');
                             }
@@ -452,29 +452,29 @@ class _IotWidgetState extends State<IotWidget> {
                                     ConnectionState.active &&
                                 snapshot.hasData) {
                               // Phân tích dữ liệu nhận được
-                              var parsedValues = snapshot.data ?? [];
+                              // var parsedValues = snapshot.data ?? [];
 
-                              // Kiểm tra có đủ 2 giá trị
-                              if (parsedValues.isNotEmpty) {
-                                // Gán giá trị cho từng biến dựa trên số lượng giá trị nhận được
-                                if (parsedValues.length >= 1) {
-                                  _currentValueId1 = parsedValues[0].toDouble();
-                                }
-                                if (parsedValues.length >= 2) {
-                                  _currentValueId2 = parsedValues[1].toDouble();
-                                }
-                                if (parsedValues.length >= 3) {
-                                  _currentValueId3 = parsedValues[2].toDouble();
-                                }
-                                if (parsedValues.length >= 4) {
-                                  _currentValueId4 = parsedValues[3].toDouble();
-                                }
+                              // // Kiểm tra có đủ 2 giá trị
+                              // if (parsedValues.isNotEmpty) {
+                              //   // Gán giá trị cho từng biến dựa trên số lượng giá trị nhận được
+                              //   if (parsedValues.length >= 1) {
+                              //     _currentValueId1 = parsedValues[0].toDouble();
+                              //   }
+                              //   if (parsedValues.length >= 2) {
+                              //     _currentValueId2 = parsedValues[1].toDouble();
+                              //   }
+                              //   if (parsedValues.length >= 3) {
+                              //     _currentValueId3 = parsedValues[2].toDouble();
+                              //   }
+                              //   if (parsedValues.length >= 4) {
+                              //     _currentValueId4 = parsedValues[3].toDouble();
+                              //   }
                                 // if (parsedValues[4] == 1) {
                                 //   _containerColor_1 = Colors.green;
                                 // }else if (parsedValues[4] == 0)
                                 //   {_containerColor_1 = Colors.red;}
                                 
-                              }
+                              //}
 
                               return Column(
                                 children: [
@@ -484,7 +484,7 @@ class _IotWidgetState extends State<IotWidget> {
                                     children: [
                                       Expanded(
                                         child: SCS(
-                                          value: _currentValueId1,
+                                          value: snapshot.data?['receivedValue1'] ?? 0.0,
                                           unit: SCS_dv_1.isEmpty
                                               ? '˚C'
                                               : SCS_dv_1,
@@ -510,7 +510,7 @@ class _IotWidgetState extends State<IotWidget> {
                                       ),
                                       Expanded(
                                         child: SCS(
-                                          value: _currentValueId2,
+                                          value: snapshot.data?['receivedValue2'] ?? 0.0,
                                           unit:
                                               SCS_dv_2.isEmpty ? '%' : SCS_dv_2,
                                           trackColor: Colors.amber,
@@ -541,7 +541,7 @@ class _IotWidgetState extends State<IotWidget> {
                                     children: [
                                       Expanded(
                                         child: SCS(
-                                          value: _currentValueId3,
+                                          value: snapshot.data?['receivedValue3'] ?? 0.0,
                                           unit: SCS_dv_3.isEmpty
                                               ? '˚C'
                                               : SCS_dv_3,
@@ -567,7 +567,7 @@ class _IotWidgetState extends State<IotWidget> {
                                       ),
                                       Expanded(
                                         child: SCS(
-                                          value: _currentValueId4,
+                                          value: snapshot.data?['receivedValue4'] ?? 0.0,
                                           unit:
                                               SCS_dv_4.isEmpty ? '%' : SCS_dv_4,
                                           trackColor: Colors.amber,
@@ -764,14 +764,12 @@ class _IotWidgetState extends State<IotWidget> {
                                           // Fluttertoast.showToast(
                                           //     msg: _ControllerSwitch1_On);
                                           print(_ControllerSwitch1_On);
-                                          _listenForESPResponseSwitch();
                                         } else {
                                           _bluetoothService.sendMessage(
                                               _ControllerSwitch1_Off);
                                           // Fluttertoast.showToast(
                                           //     msg: _ControllerSwitch1_Off);
                                           print(_ControllerSwitch1_Off);
-                                          _listenForESPResponseSwitch();
                                         }
                                       });
                                     },
@@ -824,14 +822,14 @@ class _IotWidgetState extends State<IotWidget> {
                                           // Fluttertoast.showToast(
                                           //     msg: _ControllerSwitch2_On);
                                           print(_ControllerSwitch1_On);
-                                          _listenForESPResponseSwitch();
+
                                         } else {
                                           _bluetoothService.sendMessage(
                                               _ControllerSwitch2_Off);
                                           // Fluttertoast.showToast(
                                           //     msg: _ControllerSwitch2_Off);
                                           print(_ControllerSwitch2_Off);
-                                          _listenForESPResponseSwitch();
+
                                         }
                                       });
                                     },

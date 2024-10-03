@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
@@ -20,7 +22,12 @@ class _DeviceWithAvailability {
   _DeviceWithAvailability(this.device, this.availability, [this.rssi]);
 }
 
-class BluetoothService {
+class BluetoothService with ChangeNotifier {
+
+  double? receivedValue1;
+  double? receivedValue2;
+  double? receivedValue3;
+  double? receivedValue4;
 
   BluetoothState _bluetoothState = BluetoothState.STATE_ON;
   String _address = "...";
@@ -55,9 +62,9 @@ class BluetoothService {
 
   String? dataString;
 
-  final StreamController<List<int>> _streamController = StreamController.broadcast();
+  final StreamController<Map<String, double?>> _streamController = StreamController.broadcast();
 
-  Stream<List<int>> get stream => _streamController.stream;
+  Stream<Map<String, double?>> get stream => _streamController.stream;
 
 
 
@@ -142,46 +149,52 @@ Future<void> connectToDevice(BluetoothDevice device) async {
     String dataString = utf8.decode(data);
     print("Full response: $dataString");
     // Parse dữ liệu và thêm vào luồng
-    List<int> parsedValues = _parseData(dataString);
+   // List<int> parsedValues = _parseData(dataString);
     //print('_parseData : $parsedValues');
+    //_streamController.add(parsedValues);
+    _parseAndStoreData(dataString);
 
-    _streamController.add(parsedValues);
+    // Phát dữ liệu qua stream
+    _streamController.add({
+      "receivedValue1": receivedValue1,
+      "receivedValue2": receivedValue2,
+      "receivedValue3": receivedValue3,
+      "receivedValue4": receivedValue4,
+    });
   }
 
   // Hàm phân tích dữ liệu (chỉnh sửa theo định dạng "id 1: 50 ; id 2: 30 ;")
-List<int> _parseData(String dataString) {
-  List<int> values = [];
+// List<int> _parseData(String dataString) {
+//   List<int> values = [];
+//   // Loại bỏ ký tự không mong muốn như '$' hoặc các ký tự đặc biệt khác
+//   dataString = dataString.replaceAll(RegExp(r'[\$]'), ''); // Xóa tất cả ký tự $
+//   // Tách chuỗi theo dấu chấm phẩy
+//   List<String> parts = dataString.split(';');
 
+//   for (var part in parts) {
+//     part = part.trim();
 
-  // Loại bỏ ký tự không mong muốn như '$' hoặc các ký tự đặc biệt khác
-  dataString = dataString.replaceAll(RegExp(r'[\$]'), ''); // Xóa tất cả ký tự $
-  // Tách chuỗi theo dấu chấm phẩy
-  List<String> parts = dataString.split(';');
+//     if (part.contains(':')) {
+//       List<String> subParts = part.split(':');
+//       if (subParts.length == 2) {
+//         double? value = double.tryParse(subParts[1].trim());
+//         if (value != null) {
+//           values.add(value.toInt());
+//         } else {
+//           print("Invalid value format: ${subParts[1]}");
+//         }
+//       } else {
+//         print("Invalid format in part: $part");
+//       }
+//     }
+//   }
 
-  for (var part in parts) {
-    part = part.trim();
+//   if (values.isEmpty) {
+//     print('No valid values found in dataString: $dataString');
+//   }
 
-    if (part.contains(':')) {
-      List<String> subParts = part.split(':');
-      if (subParts.length == 2) {
-        double? value = double.tryParse(subParts[1].trim());
-        if (value != null) {
-          values.add(value.toInt());
-        } else {
-          print("Invalid value format: ${subParts[1]}");
-        }
-      } else {
-        print("Invalid format in part: $part");
-      }
-    }
-  }
-
-  if (values.isEmpty) {
-    print('No valid values found in dataString: $dataString');
-  }
-
-  return values;
-}
+//   return values;
+// }
 
 
 
@@ -200,7 +213,43 @@ List<int> _parseData(String dataString) {
 //   }
 // }
 
+void _parseAndStoreData(String dataString) {
+    // Logic phân tích dữ liệu và lưu vào biến tạm temp1, temp2, temp3, temp4
+    // Sau khi lưu dữ liệu vào các biến tạm, gọi notifyListeners() để widget biết có sự thay đổi.
+    dataString = dataString.replaceAll(RegExp(r'[\$]'), '');
+    List<String> parts = dataString.split(';');
 
+    for (var part in parts) {
+      part = part.trim();
+      if (part.contains(':')) {
+        List<String> subParts = part.split(':');
+        if (subParts.length == 2) {
+          int? id = int.tryParse(subParts[0].trim().replaceAll(RegExp(r'[a-zA-Z ]'), ''));
+          double? value = double.tryParse(subParts[1].trim());
+
+          if (id != null && value != null) {
+            switch (id) {
+              case 1:
+                receivedValue1 = value;
+                break;
+              case 2:
+                receivedValue2 = value;
+                break;
+              case 3:
+                receivedValue3 = value;
+                break;
+              case 4:
+                receivedValue4 = value;
+                break;
+              default:
+                print("Unknown ID: $id");
+            }
+            notifyListeners(); // Thông báo cập nhật
+          }
+        }
+      }
+    }
+  }
 
  Stream<List<int>> receiveDataStream() {
   if (connection != null && connection!.isConnected) {
@@ -213,8 +262,6 @@ List<int> _parseData(String dataString) {
     throw Exception("Chưa kết nối với thiết bị Bluetooth");
   }
 }
-
-
 
 
   void sendMessage(String text) async {
@@ -276,6 +323,7 @@ List<int> _parseData(String dataString) {
     if (connection != null && connection!.isConnected) {
       isDisconnecting = true;
       connection?.dispose();
+      _streamController.close();
       connection = null;
     }
   }

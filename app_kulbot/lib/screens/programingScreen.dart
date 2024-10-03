@@ -44,7 +44,7 @@ class _ProgramingscreenState extends State<Programingscreen> {
         colourSecondary: '#FF8000', // Màu phụ
         colourTertiary: '#CC6600', hat: '', // Màu thứ ba
       ),
-      'logic_blocks': BlocklyBlockStyle(
+      '/': BlocklyBlockStyle(
         colourPrimary: '#4C97FF',
         colourSecondary: '#3373CC',
         colourTertiary: '#2A64B3', hat: '',
