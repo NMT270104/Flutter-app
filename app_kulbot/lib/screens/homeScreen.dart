@@ -122,9 +122,10 @@ Widget build(BuildContext context) {
         ),
         items: [
           ButtonHomeScreen(
-            imgPath: 'lib/assets/images/car.jpg',
-            textButton: AppLocalizations.of(context)!.carControl,
-            navigator: () => _navigateToScreen(context, const CarControl()),
+            imgPath: 'lib/assets/images/steering-wheel.png',
+            //textButton: AppLocalizations.of(context)!.carControl,
+            textButton: 'Control',
+            navigator: () => _navigateToScreen(context,  CarControl()),
           ),
           // ButtonHomeScreen(
           //   imgPath: 'lib/assets/images/Bascot_16.png',
@@ -132,7 +133,7 @@ Widget build(BuildContext context) {
           //   navigator: () => _navigateToScreen(context, const Bascotcontrolscreen()),
           // ),
           ButtonHomeScreen(
-            imgPath: 'lib/assets/images/black_edit_icon.png',
+            imgPath: 'lib/assets/images/program.png',
             textButton: 'Programing',
             navigator: () => _navigateToScreen(context, Programingscreen()),
           ),
@@ -159,7 +160,7 @@ Widget build(BuildContext context) {
           ButtonHomeScreen(
             imgPath: 'lib/assets/images/setting.png',
             textButton: AppLocalizations.of(context)!.setting,
-            navigator: () => _navigateToScreen(context, settingScreen()),
+            navigator: () => _navigateToScreen(context, SettingScreen()),
           ),
         ],
       ),

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
-class ScanqrcodeScreen extends StatefulWidget {
+class ScanQRWidget extends StatefulWidget {
   final Function(String) onScanComplete;
 
-  ScanqrcodeScreen({required this.onScanComplete});
+  ScanQRWidget({required this.onScanComplete});
 
   @override
-  _ScanqrcodeScreenState createState() => _ScanqrcodeScreenState();
+  _ScanQRWidgetState createState() => _ScanQRWidgetState();
 }
 
-class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
+class _ScanQRWidgetState extends State<ScanQRWidget> {
   String? _scanQRres;
   List<String> _qrCodes = [];
 
@@ -77,19 +77,49 @@ class _ScanqrcodeScreenState extends State<ScanqrcodeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: scanQRcodeStream,
-              child: Text('Scan QR Code stream'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 200,
+                  width: 200,
+                  child: 
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red
+                ),
+                                onPressed: scanQRcodeStream,
+                                child: Text('Scan QR Code stream',style: TextStyle(color: Colors.white),),
+                              ),
+                ),
+                SizedBox(width: 30,),
+            Container(
+              height: 200,
+              width: 200,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.yellow
+                ),
+                onPressed: scanQRcodeOnce,
+                child: Text('Add QR Code ',style: TextStyle(color: Colors.white)),
+              ),
             ),
-            ElevatedButton(
-              onPressed: scanQRcodeOnce,
-              child: Text('Add QR Code '),
+            SizedBox(width: 30,),
+            Container(
+              height: 200,
+              width: 200,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green
+                ),
+                onPressed: playQRcodes,
+                child: Text('Play QR Codes 📤',style: TextStyle(color: Colors.white)),
+              ),
             ),
-            ElevatedButton(
-              onPressed: playQRcodes,
-              child: Text('Play QR Codes 📤'),
+              ],
             ),
-            SizedBox(height: 20),
+            
+            SizedBox(height: 30),
             Text('Scanned QR Codes: ${_qrCodes.join(', ')}')
           ],
         ),
