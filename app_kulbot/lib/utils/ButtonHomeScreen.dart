@@ -23,7 +23,7 @@ class ButtonHomeScreen extends StatelessWidget {
             padding: EdgeInsets.only(top: 20),
             child: Container(
               width: MediaQuery.of(context).size.width*40/100,
-              height: MediaQuery.of(context).size.height*60/100,
+              height: MediaQuery.of(context).size.height*55/100,
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
                   color: Colors.white,

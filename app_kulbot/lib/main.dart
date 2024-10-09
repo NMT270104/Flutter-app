@@ -95,7 +95,7 @@ class _SplashStaKulbotate extends State<SplashState> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('lib/assets/images/kulbot.png', height: 150,),
+              Image.asset('lib/assets/images/kul_bot.png', height: 150,),
               const SizedBox(height: 30,),
               if(defaultTargetPlatform == TargetPlatform.android)
               const CupertinoActivityIndicator(
