@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   get:
   permission_handler: ^11.3.0
-  flutter_chat_bubble: ^2.0.2
+  #flutter_chat_bubble: ^2.0.2
   flutter_bluetooth_serial: ^0.4.0
 
   flutter_joystick: ^0.2.1
@@ -24,16 +24,16 @@ dependencies:
   carousel_slider: ^4.2.1
   provider: ^6.1.2
   wakelock: ^0.6.2
-  highlight_text: ^1.7.0
+  #highlight_text: ^1.7.0
   flutter_localization: ^0.2.0
   #flutter_blockly: ^1.5.1
 
   #tflite_flutter: ^0.10.4
   camera: ^0.10.5+2
-  image: ^4.0.17
+  #image: ^4.0.17
   path_provider: ^2.0.15
-  image_picker: ^1.0.0
-  exif: ^3.1.4
+  #image_picker: ^1.0.0
+  #exif: ^3.1.4
   flutter_barcode_scanner: ^2.0.0
   showcaseview: ^3.0.0
   # audioplayers: ^6.0.0
@@ -42,7 +42,7 @@ dependencies:
   #webview_flutter_plus: ^0.4.7
   sleek_circular_slider: ^2.0.1
   animated_toggle_switch: ^0.8.3
-  webview_flutter: ^4.8.0
+  #webview_flutter: ^4.8.0
   flutter_blockly_plus: ^1.4.1
 
   

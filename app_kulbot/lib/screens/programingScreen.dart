@@ -6,6 +6,7 @@ import 'package:flutter_blockly_plus/flutter_blockly_plus.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/contentPrograming.dart';
 import '../service/bluetooth_service.dart';
@@ -25,6 +26,7 @@ class _ProgramingscreenState extends State<Programingscreen> {
   String connectedDeviceName = "...";
 
   String _generatedCode = '';
+  String workspaceXml = '';
   bool _isExpanded = false;
 
   final BlocklyOptions workspaceConfiguration =
@@ -95,13 +97,188 @@ class _ProgramingscreenState extends State<Programingscreen> {
       
   });
 
-  void onInject(BlocklyData data) {
-    print('Injected: ${data.xml}');
+  // Show a dialog to input the project name and save the workspace
+Future<void> _showSaveDialog() async {
+  TextEditingController projectNameController = TextEditingController();
+  
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Save Project'),
+        content: TextField(
+          controller: projectNameController,
+          decoration: const InputDecoration(hintText: 'Enter project name'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: const Text('Save'),
+            onPressed: () {
+              // Save the project with the entered name
+              _saveProject(projectNameController.text, workspaceXml);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
+// Show a dialog with a list of saved projects to load
+Future<void> _showLoadDialog() async {
+  Map<String, String> projects = await _loadProjectList();
+
+  if (projects.isEmpty) {
+    Fluttertoast.showToast(msg: 'No projects saved');
+    return;
   }
+
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Load Project'),
+        content: SingleChildScrollView(
+          child: Column(
+            children: projects.keys.map((projectName) {
+              return ListTile(
+                title: Text(projectName),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    _deleteProject(projectName);  // Xóa project
+                    Navigator.of(context).pop();
+                    _showLoadDialog();  // Load lại danh sách sau khi xóa
+                  },
+                ),
+                onTap: () {
+                  _loadProject(projectName);
+                  loadAddons();
+                  Navigator.of(context).pop();
+                },
+              );
+            }).toList(),
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
+ // Save a new project with a unique name
+Future<void> _saveProject(String projectName, String workspaceXml) async {
+  final prefs = await SharedPreferences.getInstance();
+  
+  // Load the existing project list
+  String? savedProjectsJson = prefs.getString('projects');
+  Map<String, String> projects = {};
+  
+  if (savedProjectsJson != null) {
+    projects = Map<String, String>.from(jsonDecode(savedProjectsJson));
+  }
+  
+  // Add or update the project
+  projects[projectName] = workspaceXml;
+  
+  // Save the updated project list            
+  await prefs.setString('projects', jsonEncode(projects));
+  
+  Fluttertoast.showToast(msg: 'Project "$projectName" saved successfully');
+  print('Saved project "$projectName" with XML: $workspaceXml');
+}
+
+
+// Load the list of saved projects
+Future<Map<String, String>> _loadProjectList() async {
+  final prefs = await SharedPreferences.getInstance();
+  String? savedProjectsJson = prefs.getString('projects');
+  
+  if (savedProjectsJson != null) {
+    return Map<String, String>.from(jsonDecode(savedProjectsJson));
+  }
+  
+  return {}; // Return an empty map if no projects are saved
+}
+
+// Load a specific project by name
+Future<void> _loadProject(String projectName) async {
+  final prefs = await SharedPreferences.getInstance();
+  
+  // Load the list of projects
+  String? savedProjectsJson = prefs.getString('projects');
+  if (savedProjectsJson != null) {
+    Map<String, String> projects = Map<String, String>.from(jsonDecode(savedProjectsJson));
+    
+    // Check if the project exists
+    if (projects.containsKey(projectName)) {
+      String workspaceXml = projects[projectName]!;  // Get the XML of the selected project
+      // Inject the workspace XML into Blockly
+      setState(() {
+        _generatedCode = ''; // Clear current code
+      });
+      Fluttertoast.showToast(msg: 'Loaded project "$projectName" successfully');
+      // You will inject this XML into the Blockly editor in the `onInject` function
+    } else {
+      Fluttertoast.showToast(msg: 'Project not found');
+    }
+  } else {
+    Fluttertoast.showToast(msg: 'No projects saved');
+  }
+}
+
+
+Future<void> _deleteProject(String projectName) async {
+  final prefs = await SharedPreferences.getInstance();
+  
+  // Load danh sách project đã lưu
+  String? savedProjectsJson = prefs.getString('projects');
+  if (savedProjectsJson != null) {
+    Map<String, String> projects = Map<String, String>.from(jsonDecode(savedProjectsJson));
+    
+    // Xóa project khỏi danh sách
+    if (projects.containsKey(projectName)) {
+      projects.remove(projectName);
+      await prefs.setString('projects', jsonEncode(projects));
+      Fluttertoast.showToast(msg: 'Deleted project "$projectName" successfully');
+    } else {
+      Fluttertoast.showToast(msg: 'Project not found');
+    }
+  }
+}
+
+
+
+
+
+  void onInject(BlocklyData data) async {
+  print("inject: ${data.xml}");
+}
+
 
   void onChange(BlocklyData data) {
     setState(() {
       _generatedCode = data.js!;
+      workspaceXml = data.xml!;
+      // _saveProject('currentProject', workspaceXml);
     });
     print('Changed: ${data.xml}');
   }
@@ -197,7 +374,7 @@ class _ProgramingscreenState extends State<Programingscreen> {
           future: loadAddons(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return BlocklyEditorWidget(
+              return  BlocklyEditorWidget(
                 workspaceConfiguration: workspaceConfiguration,
                 initial: initialJson,
                 onInject: onInject,
@@ -238,6 +415,24 @@ class _ProgramingscreenState extends State<Programingscreen> {
         title: const Text('Programing'),
         toolbarHeight: 40,
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+                icon: const Icon(Icons.save),
+                onPressed: () {
+                  _showSaveDialog(); // Show the save dialog
+                },
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+                icon: const Icon(Icons.folder_open),
+                onPressed: () {
+                  _showLoadDialog(); // Show the save dialog
+                },
+              ),
+            ),
           Padding(padding: EdgeInsets.only(right: 10),
           child: IconButton(
             icon: Icon(Icons.copy),

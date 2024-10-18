@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
-import 'package:highlight_text/highlight_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter/services.dart';
@@ -38,12 +37,12 @@ class _Message {
 
 class _ControlWidgetState extends State<ControlWidget> {
   String _moveForwardCommand = 'FF';
-  String _moveFLeftCommand = '';
-  String _moveFRightCommand = '';
+  String _moveFLeftCommand = 'GG';
+  String _moveFRightCommand = 'II';
 
   String _moveBackwardCommand = 'BB';
-  String _moveBLeftCommand = '';
-  String _moveBRightCommand = '';
+  String _moveBLeftCommand = 'JJ';
+  String _moveBRightCommand = 'HH';
 
   String _moveTurnLeftCommand = 'LL';
   String _moveTurnRightCommand = 'RR';
@@ -52,29 +51,6 @@ class _ControlWidgetState extends State<ControlWidget> {
 
   final BluetoothService _bluetoothService = BluetoothService();
 
-  final Map<String, HighlightedWord> _highlights = {
-    'flutter': HighlightedWord(
-      onTap: () => print('flutter'),
-      textStyle: const TextStyle(
-        color: Colors.blue,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'right': HighlightedWord(
-      onTap: () => print('right'),
-      textStyle: const TextStyle(
-        color: Colors.green,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'left': HighlightedWord(
-      onTap: () => print('left'),
-      textStyle: const TextStyle(
-        color: Colors.red,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  };
 
   late stt.SpeechToText _speech;
   bool _isListening = false;
@@ -175,12 +151,12 @@ class _ControlWidgetState extends State<ControlWidget> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _moveForwardCommand = prefs.getString('moveForward') ?? 'FF';
-      _moveFLeftCommand = prefs.getString('moveFLeft') ?? '';
-      _moveFRightCommand = prefs.getString('moveFRight') ?? '';
+      _moveFLeftCommand = prefs.getString('moveFLeft') ?? 'GG';
+      _moveFRightCommand = prefs.getString('moveFRight') ?? 'II';
 
       _moveBackwardCommand = prefs.getString('moveBackward') ?? 'BB';
-      _moveBLeftCommand = prefs.getString('moveBLeft') ?? '';
-      _moveBRightCommand = prefs.getString('moveBRight') ?? '';
+      _moveBLeftCommand = prefs.getString('moveBLeft') ?? 'JJ';
+      _moveBRightCommand = prefs.getString('moveBRight') ?? 'HH';
 
       _moveTurnLeftCommand = prefs.getString('moveTurnLeft') ?? 'LL';
       _moveTurnRightCommand = prefs.getString('moveTurnRight') ?? 'RR';
@@ -390,11 +366,9 @@ class _ControlWidgetState extends State<ControlWidget> {
                     Container(
                       height: MediaQuery.of(context).size.height * 0.5,
                       width: MediaQuery.of(context).size.width * 0.3,
-                      child: TextHighlight(
+                      child: Text(voicetotext == '' ? "..." : voicetotext,
                         textAlign: TextAlign.center,
-                        text: voicetotext == '' ? "..." : voicetotext,
-                        words: _highlights,
-                        textStyle: const TextStyle(
+                        style: const TextStyle(
                           fontSize: 32.0,
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
