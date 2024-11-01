@@ -156,6 +156,52 @@ Blockly.defineBlocksWithJsonArray([
     "colour": 230,
   },
   {
+    'type': 'get_templm75',
+    'message0': 'Get Temperature LM75: Port %1 (˚C)',
+    'args0': [
+      {
+        'type': 'field_dropdown',
+        'name': 'get_templm75_port',
+        'options': [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "2",
+            "2"
+          ],
+          [
+            "3",
+            "3"
+          ],
+          [
+            "4",
+            "4"
+          ],
+          [
+            "5",
+            "5"
+          ],
+          [
+            "6",
+            "6"
+          ],
+          [
+            "7",
+            "7"
+          ],
+          [
+            "8",
+            "8"
+          ]
+        ]
+      }
+    ],
+    'output': 'Number',
+    "colour": 230,
+  },
+  {
     'type': 'get_tem',
     'message0': 'Get Temperature: Port %1 (˚C)',
     'args0': [
@@ -549,12 +595,104 @@ Blockly.defineBlocksWithJsonArray([
     "colour": 230,
   },
   {
+    'type': 'get_light',
+    'message0':'Get Light: Port %1',
+    'args0':[
+        {
+            'type': 'field_dropdown',
+            'name': 'get_light_port',
+            'options': [
+                [
+                    "1",
+                    "1"
+                  ],
+                  [
+                    "2",
+                    "2"
+                  ],
+                  [
+                    "3",
+                    "3"
+                  ],
+                  [
+                    "4",
+                    "4"
+                  ],
+                  [
+                    "5",
+                    "5"
+                  ],
+                  [
+                    "6",
+                    "6"
+                  ],
+                  [
+                    "7",
+                    "7"
+                  ],
+                  [
+                    "8",
+                    "8"
+                  ]
+            ]
+        }
+    ],
+    'output':'Float',
+    "colour": 230,
+},
+  {
     'type': 'get_lux',
     'message0': 'Get Lux: Port %1',
     'args0': [
       {
         'type': 'field_dropdown',
         'name': 'get_lux_port',
+        'options': [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "2",
+            "2"
+          ],
+          [
+            "3",
+            "3"
+          ],
+          [
+            "4",
+            "4"
+          ],
+          [
+            "5",
+            "5"
+          ],
+          [
+            "6",
+            "6"
+          ],
+          [
+            "7",
+            "7"
+          ],
+          [
+            "8",
+            "8"
+          ]
+        ]
+      }
+    ],
+    'output': 'Number',
+    "colour": 230,
+  },
+  {
+    'type': 'get_lux_bh1750',
+    'message0': 'Get Lux BH1750: Port %1',
+    'args0': [
+      {
+        'type': 'field_dropdown',
+        'name': 'get_lux_bh1750_port',
         'options': [
           [
             "1",

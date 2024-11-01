@@ -295,10 +295,11 @@ Future<void> _deleteProject(String projectName) async {
     List<String> addons = [];
     try {
       addons.add(await rootBundle.loadString('assets/scratch/blocks/events_generators.js'));
-      addons.add(await rootBundle.loadString('assets/scratch/blocks/control.js'));
+      // addons.add(await rootBundle.loadString('assets/scratch/blocks/control.js'));
       addons.add(await rootBundle.loadString('assets/scratch/blocks/display.js'));
       addons.add(await rootBundle.loadString('assets/scratch/blocks/motions.js'));
       addons.add(await rootBundle.loadString('assets/scratch/blocks/led.js'));
+      addons.add(await rootBundle.loadString('assets/scratch/blocks/module.js'));
       addons.add(await rootBundle.loadString('assets/scratch/blocks/sensor.js'));
       //Fluttertoast.showToast(msg: "Loaded addons successfully");
       print('Loaded addons successfully');

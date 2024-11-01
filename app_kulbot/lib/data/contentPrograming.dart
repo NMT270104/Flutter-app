@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 const String initialXml =
     '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="text" x="70" y="30"><field name="TEXT">XML</field></block></xml>';
 
+
 const Map<String, dynamic> initialJson = {
   'blocks': {
     'languageVersion': 0,
@@ -11,7 +12,7 @@ const Map<String, dynamic> initialJson = {
         'type': 'event_program_starts',
         'x': 70,
         'y': 30,
-        'deletable': true,
+        'deletable': false,
         'movable': true,
       },
       // {
@@ -24,6 +25,7 @@ const Map<String, dynamic> initialJson = {
     ]
   },
 };
+
 
 const Map<String, dynamic> newState = {
   'blocks': {
@@ -58,18 +60,10 @@ const Map<String, dynamic> initialToolboxJson = {
           'kind': 'block',
           'type': "event_program_starts"
         },
-        // {
-        //   'kind': 'block',
-        //   'type': 'event_repeat_forever'
-        // },
-        // {
-        //   'kind': 'block',
-        //   'type': "event_repeat_timer"
-        // },
-        // {
-        //   'kind': 'block',
-        //   'type': "logic_boolean_workaround"
-        // }
+        {
+          'kind': 'block',
+          'type': "move"
+        },
       ]
     },
   //Control
@@ -80,27 +74,29 @@ const Map<String, dynamic> initialToolboxJson = {
     'contents': [
       {
         "kind": "block",
-        "type": "wait_seconds",
+        "type": "control_wait_seconds",
         "inputs": {
           "TIMEOUT": {
             "shadow": {
-              "type": "math_number",  // Hoặc "math_integer"
+              "type": "math_number",
               "fields": {
                 "NUM": 1
-              }
+              },
+              "min": 1,
+              "max": 10  // Đặt giới hạn từ 1 đến 10
             }
           }
         }
       },
       {
         'kind': 'block',
-        'type': 'controls_repeat',
+        'type': 'control_repeat',
         "inputs": {
           "TIMES": {
             "shadow": {
               "type": "math_number",  // Hoặc "math_integer"
               "fields": {
-                "NUM": 0
+                "NUM": 10
               }
             }
           }
@@ -108,96 +104,221 @@ const Map<String, dynamic> initialToolboxJson = {
       },
       {
         'kind': 'block',
-        'type': 'controls_forever'
-      },
-      {
-          'kind': 'block',
-          'type': 'controls_if',
+        'type': 'control_forever'
       },
       {
         'kind': 'block',
-        'type': 'wait_until'
+        'type': 'control_if'
       },
       {
         'kind': 'block',
-        'type': 'controls_repeat_until'
-      }
+        'type': 'control_if_then_else'
+      },
+      {
+        'kind': 'block',
+        'type': 'control_repeat_until'
+      },
 
     ]
     },
-  
-  {
-    'kind': 'category',
-    'name': 'Display',
-    'colour': 230,
-    'contents': [
-      {
-        'kind': 'block',
-        'type': 'lcd_print_number',
-        "inputs": {
-          "COLUMN": {
-            "shadow": {
-              "type": "math_number",  // Hoặc "math_integer"
-              "fields": {
-                "NUM": 0
+    //Operator
+    {
+      "kind": "category",
+      "name": "Operators",
+      'colour': 150,
+      "contents": [
+        {
+          "kind": "block",
+          "type": "operators_plus",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
               }
-            }
-          },
-          "CELL": {
-            "shadow": {
-              "type": "math_number",  // Hoặc "math_integer"
-              "fields": {
-                "NUM": 0
-              }
-            }
-          },
-          "NUMBER": {
-            "shadow": {
-              "type": "math_number",  // Hoặc "math_integer"
-              "fields": {
-                "NUM": 0
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
               }
             }
           }
-        }
-      },
-      {
-        'kind': 'block',
-        'type': 'lcd_print_str',
-        "inputs": {
-          "COLUMN": {
-            "shadow": {
-              "type": "math_number",  // Hoặc "math_integer"
-              "fields": {
-                "NUM": 0
+        },
+        {
+          "kind": "block",
+          "type": "operators_minus",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
               }
-            }
-          },
-          "CELL": {
-            "shadow": {
-              "type": "math_number",  // Hoặc "math_integer"
-              "fields": {
-                "NUM": 0
-              }
-            }
-          },
-          "STRING": {
-            "shadow": {
-              "type": "text",  
-              "fields": {
-                "TEXT": "Hello!!!"
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
               }
             }
           }
-        }
-      },
-      {
-        'kind': 'block',
-        'type': 'lcd_clear'
-      }
-    ]
-  },
-  //Led
+        },
+        {
+          "kind": "block",
+          "type": "operators_multiply",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "kind": "block",
+          "type": "operators_divine",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "kind": "block",
+          "type": "operators_random",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 1
+                }
+              }
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 10
+                }
+              }
+            }
+          }
+        },
+        {
+          "kind": "block",
+          "type": "operators_more_than",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "kind": "block",
+          "type": "operators_less_than",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "kind": "block",
+          "type": "operators_equal",
+          "inputs": {
+            "NUM1": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "NUM2": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          'kind': 'block',
+          'type': 'operators_and'
+        },
+        {
+          'kind': 'block',
+          'type': 'operators_or'
+        },
+        {
+          'kind': 'block',
+          'type': 'operators_not'
+        },
+      ]
+    },
+
+    //Led
     {
       "kind": 'category',
       'name': 'Led',
@@ -213,10 +334,6 @@ const Map<String, dynamic> initialToolboxJson = {
         },
         {
           'kind': 'block',
-          'type': 'set_traffic_light'
-        },
-        {
-          'kind': 'block',
           'type': 'turn_on_all_led'
         },
         {
@@ -224,28 +341,40 @@ const Map<String, dynamic> initialToolboxJson = {
           'type': 'turn_off_led'
         },
         {
+          'kind': 'block',
+          'type': 'turn_off_all_led'
+        },
+        {
           'kind':'block',
           'type':'led_on'
         },
+      ]
+    },
+    //module
+    {
+      'kind': 'category',
+      'name': 'Module',
+      'colour': 140,
+      'contents': [
         {
-          'kind':'block',
-          'type':'get_light'
+          'kind': 'block',
+          'type':'set_traffic_light'
         },
         {
-          'kind':'block',
+          'kind': 'block',
           'type':'get_joystick'
         },
         {
-          'kind':'block',
+          'kind': 'block',
           'type':'get_volume'
         },
         {
-          'kind':'block',
+          'kind': 'block',
           'type':'get_btn_led'
-        }
-        ]
+        },
+      ]
     },
-  //Sensor
+    //Sensor
     {
       'kind':'category',
       'name': 'Sensor',
@@ -253,15 +382,19 @@ const Map<String, dynamic> initialToolboxJson = {
       'contents': [
         {
           'kind':'block',
-          'type':'get_unltra'
+          'type':'sensor_ultrasonic'
         },
         {
           'kind': 'block',
-          'type':'get_line'
+          'type':'sensor_get_line'
         },
         {
           'kind': 'block',
           'type':'get_ir'
+        },
+        {
+          'kind': 'block',
+          'type':'get_templm75'
         },
         {
           'kind': 'block',
@@ -293,70 +426,121 @@ const Map<String, dynamic> initialToolboxJson = {
         },
         {
           'kind': 'block',
+          'type':'get_light'
+        },
+        {
+          'kind': 'block',
           'type':'get_lux'
+        },
+        {
+          'kind': 'block',
+          'type':'get_lux_bh1750'
         }
       ]
-        
+
     },
-
-  {
-    'kind': 'category',
-    'name': 'Motions',
-    'colour': 220,
-    'contents':[
-      {
-        'kind': 'block',
-        'type':'motor1'
-      },
-      {
-        'kind': 'block',
-        'type':'Servo'
-      }
-    ]
-  },
-
-
-
-
 
     {
       'kind': 'category',
-      'name': 'Logic',
-      'colour': 210,
+      'name': 'Display',
+      'colour': 230,
       'contents': [
         {
           'kind': 'block',
-          'type': 'controls_if',
+          'type': 'lcd_print_number',
+          "inputs": {
+            "COLUMN": {
+              "shadow": {
+                "type": "math_number",  // Hoặc "math_integer"
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "CELL": {
+              "shadow": {
+                "type": "math_number",  // Hoặc "math_integer"
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "NUMBER": {
+              "shadow": {
+                "type": "math_number",  // Hoặc "math_integer"
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            }
+          }
         },
         {
           'kind': 'block',
-          'blockxml':
-              '<block type="logic_compare"><field name="OP">EQ</field></block>',
+          'type': 'lcd_print_str',
+          "inputs": {
+            "COLUMN": {
+              "shadow": {
+                "type": "math_number",  // Hoặc "math_integer"
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "CELL": {
+              "shadow": {
+                "type": "math_number",  // Hoặc "math_integer"
+                "fields": {
+                  "NUM": 0
+                }
+              }
+            },
+            "STRING": {
+              "shadow": {
+                "type": "text",
+                "fields": {
+                  "TEXT": "Hello!!!"
+                }
+              }
+            }
+          }
         },
         {
           'kind': 'block',
-          'blockxml':
-              '<block type="logic_operation"><field name="OP">AND</field></block>',
-        },
-        {
-          'kind': 'block',
-          'type': 'logic_negate',
-        },
-        {
-          'kind': 'block',
-          'blockxml':
-              '<block type="logic_boolean"><field name="BOOL">TRUE</field></block>',
-        },
-        {
-          'kind': 'block',
-          'type': 'logic_null',
-        },
-        {
-          'kind': 'block',
-          'type': 'logic_ternary',
-        },
-      ],
+          'type': 'lcd_clear'
+        }
+      ]
     },
+
+// Motions
+{
+'kind':'category',
+'name': 'Motions',
+'colour': 130,
+'contents': [
+  {
+    'kind':"block",
+    'type':"motor1",
+  },
+  {
+    'kind':"block",
+    'type':"Servo",
+  },
+  // {
+  //   'kind':"block",
+  //   'type':"SetEncoder",
+  // },
+  // {
+  //   'kind':"block",
+  //   'type':"SetTurningEncoder",
+  // },
+  // {
+  //   'kind':"block",
+  //   'type':"GetPostEncoder",
+  // },
+
+]},
+
     {
       'kind': 'category',
       'name': 'Loops',
@@ -423,452 +607,452 @@ const Map<String, dynamic> initialToolboxJson = {
         },
       ],
     },
-    {
-      'kind': 'category',
-      'name': 'Math',
-      'colour': 230,
-      'contents': [
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_round">
-              <field name="OP">ROUND</field>
-              <value name="NUM">
-                <shadow type="math_number">
-                  <field name="NUM">3.1</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_number">
-              <field name="NUM">0</field>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_single">
-              <field name="OP">ROOT</field>
-              <value name="NUM">
-                <shadow type="math_number">
-                  <field name="NUM">9</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_trig">
-              <field name="OP">SIN</field>
-              <value name="NUM">
-                <shadow type="math_number">
-                  <field name="NUM">45</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_constant">
-              <field name="CONSTANT">PI</field>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_number_property">
-              <mutation divisor_input="false"></mutation>
-              <field name="PROPERTY">EVEN</field>
-              <value name="NUMBER_TO_CHECK">
-                <shadow type="math_number">
-                  <field name="NUM">0</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_arithmetic">
-              <field name="OP">ADD</field>
-              <value name="A">
-                <shadow type="math_number">
-                  <field name="NUM">1</field>
-                </shadow>
-              </value>
-              <value name="B">
-                <shadow type="math_number">
-                  <field name="NUM">1</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_on_list">
-              <mutation op="SUM"></mutation>
-              <field name="OP">SUM</field>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_modulo">
-              <value name="DIVIDEND">
-                <shadow type="math_number">
-                  <field name="NUM">64</field>
-                </shadow>
-              </value>
-              <value name="DIVISOR">
-                <shadow type="math_number">
-                  <field name="NUM">10</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_constrain">
-              <value name="VALUE">
-                <shadow type="math_number">
-                  <field name="NUM">50</field>
-                </shadow>
-              </value>
-              <value name="LOW">
-                <shadow type="math_number">
-                  <field name="NUM">1</field>
-                </shadow>
-              </value>
-              <value name="HIGH">
-                <shadow type="math_number">
-                  <field name="NUM">100</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="math_random_int">
-              <value name="FROM">
-                <shadow type="math_number">
-                  <field name="NUM">1</field>
-                </shadow>
-              </value>
-              <value name="TO">
-                <shadow type="math_number">
-                  <field name="NUM">100</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'type': 'math_random_float',
-        },
-      ],
-    },
-    {
-      'kind': 'category',
-      'name': 'Text',
-      'colour': 160,
-      'contents': [
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_charAt">
-              <mutation at="true"></mutation>
-              <field name="WHERE">FROM_START</field>
-              <value name="VALUE">
-                <block type="variables_get">
-                  <field name="VAR" id="q@\$ZF(L?Zo/z`d{o.Bp!" variabletype="">text</field>
-                </block>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text">
-              <field name="TEXT"></field>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_append">
-              <field name="VAR" id=":};P,s[*|I8+L^-.EbRi" variabletype="">item</field>
-              <value name="TEXT">
-                <shadow type="text">
-                  <field name="TEXT"></field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_length">
-              <value name="VALUE">
-                <shadow type="text">
-                  <field name="TEXT">abc</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_isEmpty">
-              <value name="VALUE">
-                <shadow type="text">
-                  <field name="TEXT"></field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_indexOf">
-              <field name="END">FIRST</field>
-              <value name="VALUE">
-                <block type="variables_get">
-                  <field name="VAR" id="q@\$ZF(L?Zo/z`d{o.Bp!" variabletype="">text</field>
-                </block>
-              </value>
-              <value name="FIND">
-                <shadow type="text">
-                  <field name="TEXT">abc</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_join">
-              <mutation items="2"></mutation>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_getSubstring">
-              <mutation at1="true" at2="true"></mutation>
-              <field name="WHERE1">FROM_START</field>
-              <field name="WHERE2">FROM_START</field>
-              <value name="STRING">
-                <block type="variables_get">
-                  <field name="VAR" id="q@\$ZF(L?Zo/z`d{o.Bp!" variabletype="">text</field>
-                </block>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_changeCase">
-              <field name="CASE">UPPERCASE</field>
-              <value name="TEXT">
-                <shadow type="text">
-                  <field name="TEXT">abc</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_trim">
-              <field name="MODE">BOTH</field>
-              <value name="TEXT">
-                <shadow type="text">
-                  <field name="TEXT">abc</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_print">
-              <value name="TEXT">
-                <shadow type="text">
-                  <field name="TEXT">abc</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="text_prompt_ext">
-              <mutation type="TEXT"></mutation>
-              <field name="TYPE">TEXT</field>
-              <value name="TEXT">
-                <shadow type="text">
-                  <field name="TEXT">abc</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-      ],
-    },
-    {
-      'kind': 'category',
-      'name': 'Lists',
-      'colour': 259,
-      'contents': [
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_indexOf">
-              <field name="END">FIRST</field>
-              <value name="VALUE">
-                <block type="variables_get">
-                  <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
-                </block>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_create_with">
-              <mutation items="0"></mutation>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_repeat">
-              <value name="NUM">
-                <shadow type="math_number">
-                  <field name="NUM">5</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'type': 'lists_length',
-        },
-        {
-          'kind': 'block',
-          'type': 'lists_isEmpty',
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_create_with">
-              <mutation items="3"></mutation>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_getIndex">
-              <mutation statement="false" at="true"></mutation>
-              <field name="MODE">GET</field>
-              <field name="WHERE">FROM_START</field>
-              <value name="VALUE">
-                <block type="variables_get">
-                  <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
-                </block>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_setIndex">
-              <mutation at="true"></mutation>
-              <field name="MODE">SET</field>
-              <field name="WHERE">FROM_START</field>
-              <value name="LIST">
-                <block type="variables_get">
-                  <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
-                </block>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_getSublist">
-              <mutation at1="true" at2="true"></mutation>
-              <field name="WHERE1">FROM_START</field>
-              <field name="WHERE2">FROM_START</field>
-              <value name="LIST">
-                <block type="variables_get">
-                  <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
-                </block>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_split">
-              <mutation mode="SPLIT"></mutation>
-              <field name="MODE">SPLIT</field>
-              <value name="DELIM">
-                <shadow type="text">
-                  <field name="TEXT">,</field>
-                </shadow>
-              </value>
-            </block>
-            '''
-        },
-        {
-          'kind': 'block',
-          'blockxml': '''
-            <block type="lists_sort">
-              <field name="TYPE">NUMERIC</field>
-              <field name="DIRECTION">1</field>
-            </block>
-            '''
-        },
-      ],
-    },
+    // {
+    //   'kind': 'category',
+    //   'name': 'Math',
+    //   'colour': 230,
+    //   'contents': [
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_round">
+    //           <field name="OP">ROUND</field>
+    //           <value name="NUM">
+    //             <shadow type="math_number">
+    //               <field name="NUM">3.1</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_number">
+    //           <field name="NUM">0</field>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_single">
+    //           <field name="OP">ROOT</field>
+    //           <value name="NUM">
+    //             <shadow type="math_number">
+    //               <field name="NUM">9</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_trig">
+    //           <field name="OP">SIN</field>
+    //           <value name="NUM">
+    //             <shadow type="math_number">
+    //               <field name="NUM">45</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_constant">
+    //           <field name="CONSTANT">PI</field>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_number_property">
+    //           <mutation divisor_input="false"></mutation>
+    //           <field name="PROPERTY">EVEN</field>
+    //           <value name="NUMBER_TO_CHECK">
+    //             <shadow type="math_number">
+    //               <field name="NUM">0</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_arithmetic">
+    //           <field name="OP">ADD</field>
+    //           <value name="A">
+    //             <shadow type="math_number">
+    //               <field name="NUM">1</field>
+    //             </shadow>
+    //           </value>
+    //           <value name="B">
+    //             <shadow type="math_number">
+    //               <field name="NUM">1</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_on_list">
+    //           <mutation op="SUM"></mutation>
+    //           <field name="OP">SUM</field>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_modulo">
+    //           <value name="DIVIDEND">
+    //             <shadow type="math_number">
+    //               <field name="NUM">64</field>
+    //             </shadow>
+    //           </value>
+    //           <value name="DIVISOR">
+    //             <shadow type="math_number">
+    //               <field name="NUM">10</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_constrain">
+    //           <value name="VALUE">
+    //             <shadow type="math_number">
+    //               <field name="NUM">50</field>
+    //             </shadow>
+    //           </value>
+    //           <value name="LOW">
+    //             <shadow type="math_number">
+    //               <field name="NUM">1</field>
+    //             </shadow>
+    //           </value>
+    //           <value name="HIGH">
+    //             <shadow type="math_number">
+    //               <field name="NUM">100</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="math_random_int">
+    //           <value name="FROM">
+    //             <shadow type="math_number">
+    //               <field name="NUM">1</field>
+    //             </shadow>
+    //           </value>
+    //           <value name="TO">
+    //             <shadow type="math_number">
+    //               <field name="NUM">100</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'type': 'math_random_float',
+    //     },
+    //   ],
+    // },
+    // {
+    //   'kind': 'category',
+    //   'name': 'Text',
+    //   'colour': 160,
+    //   'contents': [
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_charAt">
+    //           <mutation at="true"></mutation>
+    //           <field name="WHERE">FROM_START</field>
+    //           <value name="VALUE">
+    //             <block type="variables_get">
+    //               <field name="VAR" id="q@\$ZF(L?Zo/z`d{o.Bp!" variabletype="">text</field>
+    //             </block>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text">
+    //           <field name="TEXT"></field>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_append">
+    //           <field name="VAR" id=":};P,s[*|I8+L^-.EbRi" variabletype="">item</field>
+    //           <value name="TEXT">
+    //             <shadow type="text">
+    //               <field name="TEXT"></field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_length">
+    //           <value name="VALUE">
+    //             <shadow type="text">
+    //               <field name="TEXT">abc</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_isEmpty">
+    //           <value name="VALUE">
+    //             <shadow type="text">
+    //               <field name="TEXT"></field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_indexOf">
+    //           <field name="END">FIRST</field>
+    //           <value name="VALUE">
+    //             <block type="variables_get">
+    //               <field name="VAR" id="q@\$ZF(L?Zo/z`d{o.Bp!" variabletype="">text</field>
+    //             </block>
+    //           </value>
+    //           <value name="FIND">
+    //             <shadow type="text">
+    //               <field name="TEXT">abc</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_join">
+    //           <mutation items="2"></mutation>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_getSubstring">
+    //           <mutation at1="true" at2="true"></mutation>
+    //           <field name="WHERE1">FROM_START</field>
+    //           <field name="WHERE2">FROM_START</field>
+    //           <value name="STRING">
+    //             <block type="variables_get">
+    //               <field name="VAR" id="q@\$ZF(L?Zo/z`d{o.Bp!" variabletype="">text</field>
+    //             </block>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_changeCase">
+    //           <field name="CASE">UPPERCASE</field>
+    //           <value name="TEXT">
+    //             <shadow type="text">
+    //               <field name="TEXT">abc</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_trim">
+    //           <field name="MODE">BOTH</field>
+    //           <value name="TEXT">
+    //             <shadow type="text">
+    //               <field name="TEXT">abc</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_print">
+    //           <value name="TEXT">
+    //             <shadow type="text">
+    //               <field name="TEXT">abc</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="text_prompt_ext">
+    //           <mutation type="TEXT"></mutation>
+    //           <field name="TYPE">TEXT</field>
+    //           <value name="TEXT">
+    //             <shadow type="text">
+    //               <field name="TEXT">abc</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //   ],
+    // },
+    // {
+    //   'kind': 'category',
+    //   'name': 'Lists',
+    //   'colour': 259,
+    //   'contents': [
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_indexOf">
+    //           <field name="END">FIRST</field>
+    //           <value name="VALUE">
+    //             <block type="variables_get">
+    //               <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
+    //             </block>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_create_with">
+    //           <mutation items="0"></mutation>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_repeat">
+    //           <value name="NUM">
+    //             <shadow type="math_number">
+    //               <field name="NUM">5</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'type': 'lists_length',
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'type': 'lists_isEmpty',
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_create_with">
+    //           <mutation items="3"></mutation>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_getIndex">
+    //           <mutation statement="false" at="true"></mutation>
+    //           <field name="MODE">GET</field>
+    //           <field name="WHERE">FROM_START</field>
+    //           <value name="VALUE">
+    //             <block type="variables_get">
+    //               <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
+    //             </block>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_setIndex">
+    //           <mutation at="true"></mutation>
+    //           <field name="MODE">SET</field>
+    //           <field name="WHERE">FROM_START</field>
+    //           <value name="LIST">
+    //             <block type="variables_get">
+    //               <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
+    //             </block>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_getSublist">
+    //           <mutation at1="true" at2="true"></mutation>
+    //           <field name="WHERE1">FROM_START</field>
+    //           <field name="WHERE2">FROM_START</field>
+    //           <value name="LIST">
+    //             <block type="variables_get">
+    //               <field name="VAR" id="e`(L;x,.j[[XN`F33Q5." variabletype="">list</field>
+    //             </block>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_split">
+    //           <mutation mode="SPLIT"></mutation>
+    //           <field name="MODE">SPLIT</field>
+    //           <value name="DELIM">
+    //             <shadow type="text">
+    //               <field name="TEXT">,</field>
+    //             </shadow>
+    //           </value>
+    //         </block>
+    //         '''
+    //     },
+    //     {
+    //       'kind': 'block',
+    //       'blockxml': '''
+    //         <block type="lists_sort">
+    //           <field name="TYPE">NUMERIC</field>
+    //           <field name="DIRECTION">1</field>
+    //         </block>
+    //         '''
+    //     },
+    //   ],
+    // },
     // {
     //   'kind': 'category',
     //   'name': 'Colour',
@@ -933,30 +1117,69 @@ const Map<String, dynamic> initialToolboxJson = {
     //   ],
     // },
     {'kind': 'sep'},
+    // {
+    //   'kind': 'category',
+    //   'name': 'Custom Button',
+    //   'colour': 19,
+    //   'contents': [
+    //     {
+    //       'kind': 'button',
+    //       'text': 'A button',
+    //       'callbackKey': 'myFirstButtonPressed',
+    //     },
+    //   ],
+    // },
+    // {
+    //   'kind': 'category',
+    //   'name': 'Variables',
+    //   'custom': 'VARIABLE',
+    //   'colour': 330,
+    // },
     {
-      'kind': 'category',
-      'name': 'Custom Button',
-      'colour': 19,
-      'contents': [
-        {
-          'kind': 'button',
-          'text': 'A button',
-          'callbackKey': 'myFirstButtonPressed',
-        },
-      ],
-    },
-    {
-      'kind': 'category',
-      'name': 'Variables',
-      'custom': 'VARIABLE',
+      "kind": "category",
+      "name": "Variables",
       'colour': 330,
+      "contents": [
+        {
+          'kind': 'block',
+          'type': "variables_create"
+        },
+        {
+          'kind': 'block',
+          'type': "variables_set",
+          "inputs": {
+            "VALUE": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 1
+                },
+              }
+            }
+          }
+        },
+        {
+          'kind': 'block',
+          'type': "variables_change",
+          "inputs": {
+            "DELTA": {
+              "shadow": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": 1
+                },
+              }
+            }
+          }
+        },
+      ]
     },
-    {
-      'kind': 'category',
-      'name': 'Functions',
-      'custom': 'PROCEDURE',
-      'colour': 290,
-    },
+    // {
+    //   'kind': 'category',
+    //   'name': 'Functions',
+    //   'custom': 'PROCEDURE',
+    //   'colour': 290,
+    // },
   ],
 };
 
