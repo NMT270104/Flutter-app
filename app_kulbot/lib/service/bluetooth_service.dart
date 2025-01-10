@@ -1,18 +1,11 @@
-import 'dart:ffi';
-
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-enum _DeviceAvailability {
-  no,
-  maybe,
-  yes,
-}
+enum _DeviceAvailability { no, maybe, yes }
 
 class _DeviceWithAvailability {
   BluetoothDevice device;
@@ -24,6 +17,7 @@ class _DeviceWithAvailability {
 
 class BluetoothService with ChangeNotifier {
 
+
   double? receivedValue1;
   double? receivedValue2;
   double? receivedValue3;
@@ -32,22 +26,24 @@ class BluetoothService with ChangeNotifier {
   BluetoothState _bluetoothState = BluetoothState.STATE_ON;
   String _address = "...";
   String _name = "...";
-  // String connectedDeviceName = "...";
+
   Function(String)? onDeviceConnected;
+  Function()? onDeviceDisconnected;
+
   bool isDisconnecting = false;
-  FlutterBluetoothSerial flutterBluetoothSerial =
-  FlutterBluetoothSerial.instance;
+  FlutterBluetoothSerial flutterBluetoothSerial = FlutterBluetoothSerial.instance;
   BluetoothConnection? connection;
   List<_DeviceWithAvailability> devices = [];
-  // Getter
+
+  // Getters
   BluetoothState get bluetoothState => _bluetoothState;
   String get address => _address;
   String get name => _name;
 
-  // Hàm callback để báo về khi có dữ liệu mới
-  Function(double)? onValueReceiveChanged; 
+  // Callback for when data values change
+  Function(double)? onValueReceiveChanged;
 
-  // Setter
+  // Setters
   set bluetoothState(BluetoothState state) {
     _bluetoothState = state;
   }
@@ -60,101 +56,81 @@ class BluetoothService with ChangeNotifier {
     _name = name;
   }
 
-  String? dataString;
-
   final StreamController<Map<String, double?>> _streamController = StreamController.broadcast();
-
   Stream<Map<String, double?>> get stream => _streamController.stream;
 
-
-
-                                                                                                            
   Future<void> requestLocationPermission() async {
     var status = await Permission.location.request();
-    if (status.isGranted) {
-      // Quyền truy cập vị trí được cấp
-    } else if (status.isDenied) {
-      // Quyền truy cập vị trí bị từ chối 
-    } else if (status.isPermanentlyDenied) {
-      // Quyền truy cập vị trí bị từ chối vĩnh viễn, mở cài đặt ứng dụng
+    if (status.isPermanentlyDenied) {
       openAppSettings();
     }
   }
 
-  void startDiscoveryWithTimeout() {
-    Timer(Duration(seconds: 10), () {
-      // Dừng quá trình tìm kiếm sau 10 giây
-      FlutterBluetoothSerial.instance.cancelDiscovery();
-    });
-    FlutterBluetoothSerial.instance.startDiscovery().listen((r) {
-      // Check if the device already exists in the list
-      bool isNewDevice = true;
-      for (var device in devices) {
-        if (device.device == r.device) {
-          isNewDevice = false;
-          device.availability = _DeviceAvailability.yes;
-          device.rssi = r.rssi;
-          break;
-        }
-      }
-      // If the device is new, add it to the list
-      if (isNewDevice) {
-        devices.add(_DeviceWithAvailability(
-          r.device,
-          _DeviceAvailability.yes,
-          r.rssi,
-        ));
-      }
-    });
-  }
-
-  void getBondedDevices() {
-    FlutterBluetoothSerial.instance
-        .getBondedDevices()
-        .then((List<BluetoothDevice> bondedDevices) {
-      devices = bondedDevices
-          .map((device) => _DeviceWithAvailability(
-                device,
-                _DeviceAvailability.maybe,
-              ))
-          .toList();
-    });
-  }
-
-
-Future<void> connectToDevice(BluetoothDevice device) async {
-  try {
-    connection = await BluetoothConnection.toAddress(device.address);
-    if (connection != null && connection!.isConnected) {
-      onDeviceConnected?.call(device.name ?? "Unknown");
-      connection!.input?.listen(_onDataReceived).onDone(() {
-        if (isDisconnecting) {
-          print('Disconnecting locally!');
-        } else {
-          print('Disconnected remotely!');
-        }
-      });
-    } else {
-      print('Connection failed or connection is null.');
-      onDeviceConnected?.call(device.name ?? "");
-
-    }
-  } catch (e) {
-    print('Error connecting to device: $e');
+Future<void> requestBluetoothPermissions() async {
+  if (await Permission.bluetoothScan.isDenied ||
+      await Permission.bluetoothConnect.isDenied ||
+      await Permission.location.isDenied) {
+    await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.location,
+    ].request();
   }
 }
 
+Future<void> startDiscoverySafely() async {
+  if (await Permission.location.isGranted) {
+    startDiscoveryWithTimeout();
+  } else {
+    await requestBluetoothPermissions();
+  }
+}
+
+  void startDiscoveryWithTimeout() {
+    Timer(Duration(seconds: 10), () {
+      flutterBluetoothSerial.cancelDiscovery();
+    });
+
+    flutterBluetoothSerial.startDiscovery().listen((r) {
+      bool isNewDevice = devices.every((device) => device.device != r.device);
+      if (isNewDevice) {
+        devices.add(_DeviceWithAvailability(r.device, _DeviceAvailability.yes, r.rssi));
+        notifyListeners();
+      }
+    });
+  }
+
+  void getBondedDevices() async {
+    List<BluetoothDevice> bondedDevices = await flutterBluetoothSerial.getBondedDevices();
+    devices = bondedDevices.map((device) => _DeviceWithAvailability(device, _DeviceAvailability.maybe)).toList();
+    notifyListeners();
+  }
+
+  Future<void> connectToDevice(BluetoothDevice device) async {
+    try {
+      connection = await BluetoothConnection.toAddress(device.address);
+      if (connection != null && connection!.isConnected) {
+        onDeviceConnected?.call(device.name ?? "Unknown");
+        connection!.input?.listen(_onDataReceived).onDone(() {
+          if (isDisconnecting) {
+            print('Disconnecting locally!');
+          } else {
+            print('Disconnected remotely!');
+            onDeviceDisconnected?.call();
+          }
+        });
+      } else {
+        print('Connection failed or connection is null.');
+      }
+    } catch (e) {
+      print('Error connecting to device: $e');
+    }
+  }
 
   void _onDataReceived(Uint8List data) {
     String dataString = utf8.decode(data);
-    print("Full response: $dataString");
-    // Parse dữ liệu và thêm vào luồng
-   // List<int> parsedValues = _parseData(dataString);
-    //print('_parseData : $parsedValues');
-    //_streamController.add(parsedValues);
     _parseAndStoreData(dataString);
 
-    // Phát dữ liệu qua stream
     _streamController.add({
       "receivedValue1": receivedValue1,
       "receivedValue2": receivedValue2,
@@ -163,111 +139,39 @@ Future<void> connectToDevice(BluetoothDevice device) async {
     });
   }
 
-  // Hàm phân tích dữ liệu (chỉnh sửa theo định dạng "id 1: 50 ; id 2: 30 ;")
-// List<int> _parseData(String dataString) {
-//   List<int> values = [];
-//   // Loại bỏ ký tự không mong muốn như '$' hoặc các ký tự đặc biệt khác
-//   dataString = dataString.replaceAll(RegExp(r'[\$]'), ''); // Xóa tất cả ký tự $
-//   // Tách chuỗi theo dấu chấm phẩy
-//   List<String> parts = dataString.split(';');
-
-//   for (var part in parts) {
-//     part = part.trim();
-
-//     if (part.contains(':')) {
-//       List<String> subParts = part.split(':');
-//       if (subParts.length == 2) {
-//         double? value = double.tryParse(subParts[1].trim());
-//         if (value != null) {
-//           values.add(value.toInt());
-//         } else {
-//           print("Invalid value format: ${subParts[1]}");
-//         }
-//       } else {
-//         print("Invalid format in part: $part");
-//       }
-//     }
-//   }
-
-//   if (values.isEmpty) {
-//     print('No valid values found in dataString: $dataString');
-//   }
-
-//   return values;
-// }
-
-
-
-
-
-
-// Stream<List<int>> receiveDataStream() {
-//   if (connection != null && connection!.isConnected) {
-//     if (connection!.input != null) {
-//       return connection!.input!.asBroadcastStream();
-//     } else {
-//       throw Exception("Không có dữ liệu đầu vào từ thiết bị Bluetooth");
-//     }
-//   } else {
-//     throw Exception("Chưa kết nối với thiết bị Bluetooth");
-//   }
-// }
-
-void _parseAndStoreData(String dataString) {
-    // Logic phân tích dữ liệu và lưu vào biến tạm temp1, temp2, temp3, temp4
-    // Sau khi lưu dữ liệu vào các biến tạm, gọi notifyListeners() để widget biết có sự thay đổi.
+  void _parseAndStoreData(String dataString) {
     dataString = dataString.replaceAll(RegExp(r'[\$]'), '');
     List<String> parts = dataString.split(';');
 
     for (var part in parts) {
-      part = part.trim();
       if (part.contains(':')) {
         List<String> subParts = part.split(':');
-        if (subParts.length == 2) {
-          int? id = int.tryParse(subParts[0].trim().replaceAll(RegExp(r'[a-zA-Z ]'), ''));
-          double? value = double.tryParse(subParts[1].trim());
+        int? id = int.tryParse(subParts[0].trim().replaceAll(RegExp(r'[a-zA-Z ]'), ''));
+        double? value = double.tryParse(subParts[1].trim());
 
-          if (id != null && value != null) {
-            switch (id) {
-              case 1:
-                receivedValue1 = value;
-                break;
-              case 2:
-                receivedValue2 = value;
-                break;
-              case 3:
-                receivedValue3 = value;
-                break;
-              case 4:
-                receivedValue4 = value;
-                break;
-              default:
-                print("Unknown ID: $id");
-            }
-            notifyListeners(); // Thông báo cập nhật
+        if (id != null && value != null) {
+          switch (id) {
+            case 1:
+              receivedValue1 = value;
+              break;
+            case 2:
+              receivedValue2 = value;
+              break;
+            case 3:
+              receivedValue3 = value;
+              break;
+            case 4:
+              receivedValue4 = value;
+              break;
           }
+          notifyListeners();
         }
       }
     }
   }
 
- Stream<List<int>> receiveDataStream() {
-  if (connection != null && connection!.isConnected) {
-    if (connection!.input != null) {
-      return connection!.input!.asBroadcastStream();
-    } else {
-      throw Exception("Không có dữ liệu đầu vào từ thiết bị Bluetooth");
-    }
-  } else {
-    throw Exception("Chưa kết nối với thiết bị Bluetooth");
-  }
-}
-
-
   void sendMessage(String text) async {
-    text = text.trim();
-
-    if (text.isNotEmpty  && connection != null) {
+    if (text.isNotEmpty && connection != null && connection!.isConnected) {
       try {
         connection!.output.add(Uint8List.fromList(utf8.encode(text)));
         await connection!.output.allSent;
@@ -277,54 +181,102 @@ void _parseAndStoreData(String dataString) {
     }
   }
 
-  Future<void> connectBluetoothDialog(BuildContext context) async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          alignment: Alignment.center,
-          title: const Text(
-            'Bluetooth ',
-            style: TextStyle(fontSize: 20, color: Colors.black),
-          ),
-          content: _bluetoothState.isEnabled && devices.isNotEmpty
-              ? buildDevicesListView(context)
-              : Text("Không tìm thấy thiết bị hoặc chưa bật bluetooth")),
-    );
-  }
+ Future<void> connectBluetoothDialog(BuildContext context) async {
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          // Start discovery only once when dialog is opened
+          if (_bluetoothState.isEnabled && devices.isEmpty) {
+            startDiscoverySafely(); // Pass setState
+          }
 
-  Widget buildDevicesListView(BuildContext context) {
+          return AlertDialog(
+            alignment: Alignment.center,
+            title: const Text(
+              'Bluetooth',
+              style: TextStyle(fontSize: 20, color: Colors.black),
+            ),
+            content: _bluetoothState.isEnabled
+                ? buildDevicesListView(context, setState)
+                : const Text("Không tìm thấy thiết bị hoặc chưa bật bluetooth"),
+          );
+        },
+      );
+    },
+  );
+}
+
+
+  /// Build the list of available devices
+  Widget buildDevicesListView(BuildContext context, setState) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    
-    List<Widget> list = devices
-        .map((_device) => ListTile(
-              title: Text(_device.device.name ?? "Unknown"),
-              subtitle: Text(_device.device.address),
-              trailing: _device.availability == _DeviceAvailability.yes
-                  ? Icon(Icons.check_circle, color: Colors.green)
-                  : null,
-              onTap: () {
-                connectToDevice(_device.device);
-                Navigator.of(context).pop();
-              },
-            ))
-        .toList();
 
     return Container(
       color: Colors.grey[50],
-      width: screenWidth * 1,
+      width: screenWidth * 0.5,
       height: screenHeight * 0.50,
-      child: ListView(children:list  ),
+      child: ListView(
+        children: devices.map((_device) {
+          Color iconColor =  Colors.green;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: ElevatedButton(
+              onPressed: () async {
+                await connectToDevice(_device.device);
+                Navigator.of(context).pop(); // Close dialog
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(10, 50),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                shadowColor: Colors.grey[300],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    _device.device.name ?? "Unknown",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _device.device.address,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(width: 3),
+                      Icon(
+                        Icons.android,
+                        color: iconColor,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
+  @override
   void dispose() {
-    FlutterBluetoothSerial.instance.cancelDiscovery();
+    flutterBluetoothSerial.cancelDiscovery();
     if (connection != null && connection!.isConnected) {
       isDisconnecting = true;
       connection?.dispose();
-      _streamController.close();
       connection = null;
     }
+    _streamController.close();
+    super.dispose();
   }
 }

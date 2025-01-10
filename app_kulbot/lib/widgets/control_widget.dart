@@ -68,7 +68,7 @@ class _ControlWidgetState extends State<ControlWidget> {
 
 
   bool get isConnected => (_bluetoothService.connection?.isConnected ?? false);
-  String connectedDeviceName = "...";
+  String connectedDeviceName = "Chưa kết nối với robot";
 
   @override
   void initState() {
@@ -101,7 +101,14 @@ class _ControlWidgetState extends State<ControlWidget> {
 
     _bluetoothService.onDeviceConnected = (String deviceName) {
       setState(() {
-        connectedDeviceName = deviceName;
+        
+        connectedDeviceName = "Đã kết nối với $deviceName";
+      });
+    };
+
+    _bluetoothService.onDeviceDisconnected = () {
+      setState(() {
+        connectedDeviceName = "Chưa kết nối với robot";
       });
     };
 
@@ -176,9 +183,10 @@ class _ControlWidgetState extends State<ControlWidget> {
     return ShowCaseWidget(
       builder: (context) => Scaffold(
         appBar: AppBar(
-          title: Text(isConnected
-              ? 'Đã kết nối với robot ${connectedDeviceName}'
-              : 'Chưa kết nối với robot'),
+          title: Text("$connectedDeviceName"),
+            // isConnected
+            //   ? 'Đã kết nối với robot ${connectedDeviceName}'
+            //   : 'Chưa kết nối với robot'),
           actions: [
             Showcase(
               key: _one,
@@ -352,7 +360,7 @@ class _ControlWidgetState extends State<ControlWidget> {
                             ),
                           ),
                           stick: JoystickStick(
-                            size: 90,
+                            size: 100,
                                 decoration: JoystickStickDecoration(
                                   color: Colors.yellow,
                                   
@@ -366,7 +374,7 @@ class _ControlWidgetState extends State<ControlWidget> {
                     Container(
                       height: MediaQuery.of(context).size.height * 0.5,
                       width: MediaQuery.of(context).size.width * 0.3,
-                      child: Text(voicetotext == '' ? "..." : voicetotext,
+                      child: Text(voicetotext == '' ? "" : voicetotext,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 32.0,
@@ -399,7 +407,7 @@ class _ControlWidgetState extends State<ControlWidget> {
                             ),
                           ),
                           stick: JoystickStick(
-                            size: 90,
+                            size: 100,
                                 decoration: JoystickStickDecoration(
                                   color: Colors.yellow,
                                   

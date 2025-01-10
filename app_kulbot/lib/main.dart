@@ -1,6 +1,7 @@
 import 'package:Kulbot/l10n/l10n.dart';
 import 'package:Kulbot/provider/provider.dart';
 import 'package:Kulbot/screens/homeScreen.dart';
+import 'package:Kulbot/service/bluetooth_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

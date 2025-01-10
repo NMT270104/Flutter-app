@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-const String initialXml =
+const String initialXml = 
     '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="text" x="70" y="30"><field name="TEXT">XML</field></block></xml>';
 
 

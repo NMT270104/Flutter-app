@@ -115,6 +115,7 @@ Widget build(BuildContext context) {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: CarouselSlider(
+        carouselController: CarouselController(),
         options: CarouselOptions(
           aspectRatio: 16 / 9,
           enlargeCenterPage: true,
